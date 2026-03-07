@@ -1151,7 +1151,6 @@ async function saveItem() {
   }
 
   const item = { id, name, stickers, quantity, imageUrl, imageData, createdAt: Date.now() };
-  await addItem(item);
 
   try {
     await addItem(item);
