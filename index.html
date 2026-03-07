@@ -837,7 +837,8 @@ function saveLocal() {
 ============================================================ */
 async function addItem(item) {
   if (isSupabaseMode()) {
-    await sbClient.from('sticker_items').upsert(itemToRow(item));
+    const { error } = await sbClient.from('sticker_items').upsert(itemToRow(item));
+    if (error) { showToast('❌ 添加失败，请重试'); throw error; }
   } else {
     items.push(item);
     saveLocal();
@@ -847,7 +848,8 @@ async function addItem(item) {
 
 async function removeItem(id) {
   if (isSupabaseMode()) {
-    await sbClient.from('sticker_items').delete().eq('id', id);
+    const { error } = await sbClient.from('sticker_items').delete().eq('id', id);
+    if (error) { showToast('❌ 删除失败，请重试'); return; }
   } else {
     items = items.filter(i => i.id !== id);
     saveLocal();
@@ -874,28 +876,39 @@ async function redeemItem(id, qty) {
   };
 
   if (isSupabaseMode()) {
-    // Apply optimistic local update first — UI responds immediately
+    // Optimistic local update — UI responds immediately
     history.push(histEntry);
     item.quantity = Math.max(0, remaining);
     saveLocal();
     renderCatalog();
     renderHistory();
-    // UPDATE quantity FIRST — so when history INSERT triggers Realtime,
-    // loadFromSupabase already sees the correct (reduced) quantity
-    const { error: qtyErr } = await sbClient.from('sticker_items')
-      .update({ quantity: Math.max(0, remaining) }).eq('id', id);
-    if (qtyErr) console.error('Quantity update failed:', qtyErr.message);
-    // Then INSERT history record
+
+    // STEP 1: INSERT history FIRST (the critical record)
     const histRow = histToRow(histEntry);
     let { error: histErr } = await sbClient.from('sticker_history').insert(histRow);
     if (histErr) {
-      // Fallback without redeemed_qty if the column hasn't been added yet
+      // Fallback without redeemed_qty column
       const fallback = { ...histRow };
       delete fallback.redeemed_qty;
       ({ error: histErr } = await sbClient.from('sticker_history').insert(fallback));
-      if (histErr) console.error('History insert failed:', histErr.message);
     }
-    // Force one final reload to ensure UI is in sync with server state
+    if (histErr) {
+      // Rollback optimistic update — history insert failed
+      history = history.filter(h => h.id !== histEntry.id);
+      item.quantity = (item.quantity ?? 0) + qty;
+      saveLocal();
+      renderCatalog();
+      renderHistory();
+      showToast('❌ 兑换失败，请检查网络后重试');
+      return;
+    }
+
+    // STEP 2: UPDATE quantity (history already recorded, so data is safe)
+    const { error: qtyErr } = await sbClient.from('sticker_items')
+      .update({ quantity: Math.max(0, remaining) }).eq('id', id);
+    if (qtyErr) console.error('Quantity update failed:', qtyErr.message);
+
+    // Final sync
     await loadFromSupabase();
   } else {
     history.push(histEntry);
@@ -1053,6 +1066,7 @@ function switchTab(tab) {
   document.getElementById('fab').style.display = tab === 'catalog' ? '' : 'none';
   if (tab === 'history') renderHistory();
   if (tab === 'ledger')  renderLedger();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
 /* ============================================================
@@ -1139,25 +1153,36 @@ async function saveItem() {
   const item = { id, name, stickers, quantity, imageUrl, imageData, createdAt: Date.now() };
   await addItem(item);
 
-  btn.disabled = false;
-  btn.textContent = '添加商品';
-  closeAddModal();
-  showToast('🎉 商品已添加！');
+  try {
+    await addItem(item);
+    closeAddModal();
+    showToast('🎉 商品已添加！');
+  } catch(e) {
+    // error toast already shown in addItem
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '添加商品';
+  }
 }
 
 /* ============================================================
    Delete Item
 ============================================================ */
 async function deleteItem(id) {
-  if (!confirm('确定要删除这个商品吗？')) return;
+  const item = items.find(i => i.id === id);
+  const name = item ? `「${item.name}」` : '这个商品';
+  if (!confirm(`确定要删除 ${name} 吗？`)) return;
   await removeItem(id);
   showToast('商品已删除');
 }
 
 async function deleteHistoryItem(id) {
-  if (!confirm('确定要删除这条兑换记录吗？')) return;
+  const item = history.find(i => i.id === id);
+  const name = item ? `「${item.name}」` : '这条兑换记录';
+  if (!confirm(`确定要删除 ${name} 的兑换记录吗？`)) return;
   if (isSupabaseMode()) {
-    await sbClient.from('sticker_history').delete().eq('id', id);
+    const { error } = await sbClient.from('sticker_history').delete().eq('id', id);
+    if (error) { showToast('❌ 删除失败，请重试'); return; }
   } else {
     history = history.filter(i => i.id !== id);
     saveLocal();
@@ -1454,9 +1479,14 @@ async function saveLedgerEntry() {
 }
 
 async function deleteLedgerEntry(id) {
-  if (!confirm('确定要删除这条贴纸记录吗？')) return;
+  const entry = ledger.find(e => e.id === id);
+  if (!entry) return;
+  const sign   = entry.type === 'earn' ? '−' : '+';
+  const impact = entry.type === 'earn' ? `余额将减少 ${entry.stickers} 张` : `余额将增加 ${entry.stickers} 张`;
+  if (!confirm(`确定要删除「${entry.category}」记录吗？\n删除后${impact}。`)) return;
   if (isSupabaseMode()) {
-    await sbClient.from('sticker_ledger').delete().eq('id', id);
+    const { error } = await sbClient.from('sticker_ledger').delete().eq('id', id);
+    if (error) { showToast('❌ 删除失败，请重试'); return; }
     await loadLedgerFromSupabase();
   } else {
     ledger = ledger.filter(e => e.id !== id);
