@@ -779,7 +779,7 @@ async function loadFromSupabase() {
     sbClient.from('sticker_items').select('*').order('created_at'),
     sbClient.from('sticker_history').select('*').order('redeemed_at')
   ]);
-  if (!r2.error) { history = (r2.data || []).map(rowToItem); renderHistory(); }
+  if (!r2.error) { history = (r2.data || []).map(rowToItem); renderHistory(); renderLedger(); }
   if (!r1.error) {
     const sbItems = (r1.data || []).map(rowToItem);
     const sbIds   = new Set(sbItems.map(i => i.id));
@@ -900,7 +900,7 @@ async function redeemItem(id, qty) {
       renderCatalog();
       renderHistory();
       showToast('❌ 兑换失败，请检查网络后重试');
-      return;
+      return false;
     }
 
     // STEP 2: UPDATE quantity (history already recorded, so data is safe)
@@ -917,6 +917,7 @@ async function redeemItem(id, qty) {
     renderCatalog();
     renderHistory();
   }
+  return true;
 }
 
 /* ============================================================
@@ -1269,8 +1270,9 @@ async function executeRedeem() {
   if (!pendingRedeemId) return;
   const btn = document.getElementById('btn-do-redeem');
   btn.disabled = true;
-  await redeemItem(pendingRedeemId, pendingRedeemQty);
+  const ok = await redeemItem(pendingRedeemId, pendingRedeemQty);
   btn.disabled = false;
+  if (!ok) return;  // redeemItem already showed error toast and rolled back
   const qty = pendingRedeemQty;
   closeConfirmModal();
   showToast(qty > 1 ? `🎊 成功兑换 ${qty} 个！` : '🎊 兑换成功！已记录到历史');
@@ -1465,7 +1467,14 @@ async function saveLedgerEntry() {
     ledger.push(entry);
     saveLocal(); renderLedger();
     const { error } = await sbClient.from('sticker_ledger').insert(ledgerEntryToRow(entry));
-    if (error) console.error('Ledger insert failed:', error.message);
+    if (error) {
+      // Rollback optimistic update
+      ledger = ledger.filter(e => e.id !== entry.id);
+      saveLocal(); renderLedger();
+      btn.disabled = false;
+      showToast('❌ 记录失败，请检查网络后重试');
+      return;
+    }
     await loadLedgerFromSupabase();
   } else {
     ledger.push(entry);
