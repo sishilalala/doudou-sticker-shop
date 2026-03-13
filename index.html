@@ -759,11 +759,12 @@ function histToRow(entry) {
   };
 }
 
-function tryInitSupabase() {
+async function tryInitSupabase() {
   try {
     sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    loadFromSupabase();
-    loadLedgerFromSupabase();
+    // Load both in parallel, then render ledger once both are ready
+    await Promise.all([loadFromSupabase(), loadLedgerFromSupabase()]);
+    renderLedger();
     subscribeSupabase();
     setSyncIndicator(true);
     return true;
@@ -779,7 +780,7 @@ async function loadFromSupabase() {
     sbClient.from('sticker_items').select('*').order('created_at'),
     sbClient.from('sticker_history').select('*').order('redeemed_at')
   ]);
-  if (!r2.error) { history = (r2.data || []).map(rowToItem); renderHistory(); renderLedger(); }
+  if (!r2.error) { history = (r2.data || []).map(rowToItem); renderHistory(); }
   if (!r1.error) {
     const sbItems = (r1.data || []).map(rowToItem);
     const sbIds   = new Set(sbItems.map(i => i.id));
@@ -804,7 +805,7 @@ function subscribeSupabase() {
   if (sbChannel) sbChannel.unsubscribe();
   sbChannel = sbClient.channel('db-changes')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'sticker_items' },   () => loadFromSupabase())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'sticker_history' }, () => loadFromSupabase())
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'sticker_history' }, () => loadFromSupabase().then(() => renderLedger()))
     .on('postgres_changes', { event: '*', schema: 'public', table: 'sticker_ledger' },  () => loadLedgerFromSupabase())
     .subscribe();
 }
