@@ -1525,11 +1525,14 @@ function ledgerEntryToRow(entry) {
 async function loadLedgerFromSupabase() {
   if (!sbClient) return;
   const { data, error } = await sbClient.from('sticker_ledger').select('*').order('created_at', { ascending: false });
-  if (!error) {
-    ledger = (data || []).map(ledgerRowToEntry);
-    saveLocal();
-    renderLedger();
+  if (error) {
+    console.error('Ledger load failed:', error.message, error);
+    showToast('⚠️ 账本加载失败: ' + error.message);
+    return;
   }
+  ledger = (data || []).map(ledgerRowToEntry);
+  saveLocal();
+  renderLedger();
 }
 
 /* ============================================================
