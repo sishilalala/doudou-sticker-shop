@@ -1023,13 +1023,16 @@ function renderHistory() {
     return;
   }
 
-  // Total items and stickers
+  // Total items and stickers (tracked records only)
   const totalItems    = history.reduce((sum, i) => sum + (i.redeemedQty ?? 1), 0);
-  const totalStickers = history.reduce((sum, i) => sum + (i.stickers || 0) * (i.redeemedQty ?? 1), 0);
+  const trackedStickers = history.reduce((sum, i) => sum + (i.stickers || 0) * (i.redeemedQty ?? 1), 0);
+  // Include pre-system historical redemptions so totals match the ledger
+  const totalStickers = HISTORICAL_REDEEM + trackedStickers;
   summary.style.display = 'flex';
   summary.innerHTML = `
     <div>
       <div class="sum-label">🎉 共兑换 ${totalItems} 件商品</div>
+      ${HISTORICAL_REDEEM > 0 ? `<div style="font-size:0.72em;color:#aaa;margin-top:2px">（另有建账前 ${HISTORICAL_REDEEM} 张历史记录）</div>` : ''}
     </div>
     <div style="text-align:right">
       <div class="sum-label">累计消耗贴纸</div>
