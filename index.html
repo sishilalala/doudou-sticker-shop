@@ -995,7 +995,7 @@ function renderCatalog() {
   }
   grid.innerHTML = visible.map(item => `
     <div class="card-wrapper">
-      <div class="card" onclick="">
+      <div class="card">
         ${imgHtml(item)}
         <div class="card-body">
           <p class="card-name">${escHtml(item.name)}</p>
@@ -1493,7 +1493,6 @@ async function saveLedgerEntry() {
 async function deleteLedgerEntry(id) {
   const entry = ledger.find(e => e.id === id);
   if (!entry) return;
-  const sign   = entry.type === 'earn' ? '−' : '+';
   const impact = entry.type === 'earn' ? `余额将减少 ${entry.stickers} 张` : `余额将增加 ${entry.stickers} 张`;
   if (!confirm(`确定要删除「${entry.category}」记录吗？\n删除后${impact}。`)) return;
   if (isSupabaseMode()) {
@@ -1530,7 +1529,7 @@ async function loadLedgerFromSupabase() {
   const { data, error } = await sbClient.from('sticker_ledger').select('*').order('created_at', { ascending: false });
   if (error) {
     console.error('Ledger load failed:', error.message, error);
-    showToast('⚠️ 账本加载失败: ' + error.message);
+    showToast('⚠️ 账本加载失败，请刷新重试');
     return;
   }
   ledger = (data || []).map(ledgerRowToEntry);
