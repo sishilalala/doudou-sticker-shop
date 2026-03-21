@@ -995,7 +995,7 @@ function renderCatalog() {
   }
   grid.innerHTML = visible.map(item => `
     <div class="card-wrapper">
-      <div class="card" onclick="">
+      <div class="card">
         ${imgHtml(item)}
         <div class="card-body">
           <p class="card-name">${escHtml(item.name)}</p>
@@ -1023,13 +1023,16 @@ function renderHistory() {
     return;
   }
 
-  // Total items and stickers
+  // Total items and stickers (tracked records only)
   const totalItems    = history.reduce((sum, i) => sum + (i.redeemedQty ?? 1), 0);
-  const totalStickers = history.reduce((sum, i) => sum + (i.stickers || 0) * (i.redeemedQty ?? 1), 0);
+  const trackedStickers = history.reduce((sum, i) => sum + (i.stickers || 0) * (i.redeemedQty ?? 1), 0);
+  // Include pre-system historical redemptions so totals match the ledger
+  const totalStickers = HISTORICAL_REDEEM + trackedStickers;
   summary.style.display = 'flex';
   summary.innerHTML = `
     <div>
       <div class="sum-label">🎉 共兑换 ${totalItems} 件商品</div>
+      ${HISTORICAL_REDEEM > 0 ? `<div style="font-size:0.72em;color:#aaa;margin-top:2px">（另有建账前 ${HISTORICAL_REDEEM} 张历史记录）</div>` : ''}
     </div>
     <div style="text-align:right">
       <div class="sum-label">累计消耗贴纸</div>
@@ -1490,7 +1493,6 @@ async function saveLedgerEntry() {
 async function deleteLedgerEntry(id) {
   const entry = ledger.find(e => e.id === id);
   if (!entry) return;
-  const sign   = entry.type === 'earn' ? '−' : '+';
   const impact = entry.type === 'earn' ? `余额将减少 ${entry.stickers} 张` : `余额将增加 ${entry.stickers} 张`;
   if (!confirm(`确定要删除「${entry.category}」记录吗？\n删除后${impact}。`)) return;
   if (isSupabaseMode()) {
@@ -1527,7 +1529,7 @@ async function loadLedgerFromSupabase() {
   const { data, error } = await sbClient.from('sticker_ledger').select('*').order('created_at', { ascending: false });
   if (error) {
     console.error('Ledger load failed:', error.message, error);
-    showToast('⚠️ 账本加载失败: ' + error.message);
+    showToast('⚠️ 账本加载失败，请刷新重试');
     return;
   }
   ledger = (data || []).map(ledgerRowToEntry);
