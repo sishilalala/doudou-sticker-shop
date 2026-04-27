@@ -1,1591 +1,1643 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>🏷️ 豆豆贴纸奖励</title>
-  <style>
-    /* ===== Reset & Variables ===== */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --primary: #FF6B6B;
-      --primary-light: #FF9B9B;
-      --secondary: #FFB347;
-      --gold: #e8a020;
-      --gold-bg: #fff8e1;
-      --green: #2d9e5a;
-      --green-bg: #e6f9ee;
-      --bg: #fff8f4;
-      --card-bg: #ffffff;
-      --text: #2d2d2d;
-      --text-muted: #888;
-      --border: #ffe4d0;
-      --shadow: 0 4px 18px rgba(255,107,107,0.13);
-      --shadow-hover: 0 8px 30px rgba(255,107,107,0.22);
-      --radius: 16px;
-    }
-    body {
-      font-family: 'PingFang SC','Hiragino Sans GB','Microsoft YaHei',system-ui,-apple-system,sans-serif;
-      background: var(--bg);
-      min-height: 100vh;
-      color: var(--text);
-      -webkit-tap-highlight-color: transparent;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>豆豆奖励兑换商店 · 积木拼盘</title>
+<link href="https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=ZCOOL+QingKe+HuangYou&family=Ma+Shan+Zheng&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:         #FFF8E8;
+    --ink:        #1C1810;
+    --ink-soft:   #6B5D3F;
+    --line:       #1C1810;
 
-    /* ===== Header ===== */
-    .app-header {
-      background: linear-gradient(160deg, #FF6B6B 0%, #FFB347 100%);
-      color: #fff;
-      padding: 20px 16px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      overflow: hidden;
-    }
-    .app-header::before {
-      content: ''; position: absolute; right: -30px; top: -30px;
-      width: 160px; height: 160px; border-radius: 50%;
-      background: rgba(255,255,255,.12); pointer-events: none;
-    }
-    .app-header::after {
-      content: ''; position: absolute; left: -40px; bottom: -50px;
-      width: 200px; height: 200px; border-radius: 50%;
-      background: rgba(255,255,255,.08); pointer-events: none;
-    }
-    .app-header > * { position: relative; z-index: 1; }
-    .app-header-title h1 { font-size: 20px; font-weight: 700; letter-spacing: .5px; }
-    .app-header-title p  { font-size: 11px; opacity: .8; margin-top: 2px; }
-    .btn-sync-setup {
-      background: rgba(255,255,255,.22);
-      border: 1.5px solid rgba(255,255,255,.5);
-      color: #fff;
-      font-family: inherit;
-      font-size: 12px;
-      font-weight: 600;
-      padding: 6px 12px;
-      border-radius: 20px;
-      cursor: pointer;
-      white-space: nowrap;
-      transition: background .15s;
-    }
-    .btn-sync-setup:hover { background: rgba(255,255,255,.32); }
-    .sync-dot {
-      display: inline-block;
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: #6deba5;
-      margin-right: 4px;
-      vertical-align: middle;
-    }
-    .sync-dot.off { background: rgba(255,255,255,.45); }
+    /* Bento palette — 6 flavors */
+    --c1: #FFD43B; /* lemon */
+    --c2: #FF6B6B; /* tomato */
+    --c3: #4DABF7; /* sky */
+    --c4: #51CF66; /* grass */
+    --c5: #B197FC; /* grape */
+    --c6: #FF922B; /* tangerine */
+    --c7: #FFA8A8; /* pink */
+    --c8: #63E6BE; /* mint */
+    --cream:#FFF4D0;
 
-    /* ===== Tabs ===== */
-    nav {
-      display: flex;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,.07);
-      position: sticky;
-      top: 0;
-      z-index: 30;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 13px 8px;
-      border: none;
-      background: none;
-      font-family: inherit;
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-muted);
-      cursor: pointer;
-      border-bottom: 3px solid transparent;
-      transition: all .2s;
-    }
-    .tab-btn.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+    --shadow: 0 4px 0 var(--line);
+    --shadow-lg: 0 8px 0 var(--line);
+  }
 
-    /* ===== Pages ===== */
-    .page { display: none; }
-    .page.active { display: block; }
-    .grid-wrap { padding: 14px 14px 88px; max-width: 900px; margin: 0 auto; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-      gap: 12px;
-    }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:"ZCOOL KuaiLe","Baloo 2",system-ui,sans-serif;overflow-x:hidden}
+  body{
+    background-image:
+      radial-gradient(circle at 10px 10px, rgba(28,24,16,.12) 1.5px, transparent 2px);
+    background-size: 32px 32px;
+    min-height:100vh;
+    padding-bottom:60px;
+  }
 
-    /* ===== Card ===== */
-    .card {
-      background: var(--card-bg);
-      border-radius: var(--radius);
-      overflow: hidden;
-      box-shadow: var(--shadow);
-      transition: transform .2s, box-shadow .2s;
-    }
-    .card:not(.card-history):hover { transform: translateY(-3px); box-shadow: var(--shadow-hover); }
-    .card-img {
-      width: 100%; height: 120px;
-      object-fit: cover;
-      background: linear-gradient(135deg, #FFE8D6, #FFD6E8);
-      display: block;
-    }
-    .card-img-placeholder {
-      width: 100%; height: 120px;
-      background: linear-gradient(135deg, #FFE8D6, #FFD6E8);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 38px;
-    }
-    .card-body { padding: 10px 10px 11px; }
-    .card-name {
-      font-size: 13px; font-weight: 600; color: var(--text);
-      margin-bottom: 6px; line-height: 1.35;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-      overflow: hidden;
-    }
-    .sticker-badge {
-      display: inline-flex; align-items: center; gap: 3px;
-      background: var(--gold-bg); color: var(--gold);
-      font-weight: 700; font-size: 12px;
-      padding: 2px 8px; border-radius: 20px;
-      margin-bottom: 5px;
-    }
-    /* Stock / remaining quantity badge */
-    .stock-badge {
-      display: inline-flex; align-items: center; gap: 3px;
-      background: #f0f7ff; color: #3a7bd5;
-      font-weight: 600; font-size: 11px;
-      padding: 2px 7px; border-radius: 20px;
-      margin-bottom: 7px;
-    }
-    .stock-badge.low { background: #fff5f0; color: #e05a2a; }
-    .btn-redeem {
-      width: 100%; padding: 7px 4px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff; border: none; border-radius: 8px;
-      font-family: inherit; font-size: 12px; font-weight: 700;
-      cursor: pointer; transition: opacity .15s;
-    }
-    .btn-redeem:active { opacity: .8; }
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+  img{display:block;max-width:100%}
+  a{color:inherit}
 
-    /* Card delete button */
-    .card-wrapper { position: relative; }
-    .btn-delete-card {
-      position: absolute; top: 6px; right: 6px;
-      width: 24px; height: 24px;
-      background: rgba(0,0,0,.45);
-      border: none; border-radius: 50%;
-      color: #fff; font-size: 13px; line-height: 1;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity .15s;
-      z-index: 2;
-    }
-    .card-wrapper:hover .btn-delete-card { opacity: 1; }
-    @media (hover: none) { .btn-delete-card { opacity: .7; } }
+  /* ============== TOP BAR ============== */
+  .topbar{
+    max-width:1240px;margin:0 auto;
+    padding:28px 32px 12px;
+    display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+  }
+  .logo{
+    display:flex;align-items:center;gap:14px;
+  }
+  .logo-mark{
+    /* Handwritten 豆豆 wordmark */
+    font-family:"Ma Shan Zheng", "ZCOOL KuaiLe", cursive;
+    font-size:54px;
+    line-height:1;
+    color:var(--ink);
+    padding:6px 18px 10px;
+    background:var(--c1);
+    border:3px solid var(--line);
+    border-radius:22px 28px 24px 30px;
+    box-shadow:var(--shadow);
+    transform:rotate(-4deg);
+    letter-spacing:-.04em;
+    position:relative;
+  }
+  .logo-mark::after{
+    /* tiny sticker dot accent */
+    content:'';position:absolute;top:-8px;right:-8px;
+    width:18px;height:18px;border-radius:50%;
+    background:var(--c2);border:3px solid var(--line);
+  }
+  .logo-text{line-height:.95}
+  .logo-text h1{
+    font-family:"ZCOOL QingKe HuangYou";
+    font-size:34px;letter-spacing:.02em;
+    white-space:nowrap;
+  }
+  .logo-text .sub{font-size:14px;color:var(--ink-soft);margin-top:4px;letter-spacing:.1em}
 
-    /* ===== History card ===== */
-    .card-history { opacity: .88; }
-    .tag-redeemed {
-      display: inline-block;
-      background: var(--green-bg); color: var(--green);
-      font-size: 10px; font-weight: 700;
-      padding: 2px 7px; border-radius: 20px;
-      margin-bottom: 4px;
-    }
-    .redeemed-date { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
-    .added-date { font-size: 10px; color: var(--text-muted); margin-top: 2px; margin-bottom: 6px; }
+  .topbar-spacer{flex:1}
 
-    /* History summary bar */
-    #history-summary {
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff;
-      border-radius: 14px;
-      padding: 14px 18px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    #history-summary .sum-label { font-size: 13px; opacity: .88; }
-    #history-summary .sum-value { font-size: 22px; font-weight: 700; letter-spacing: .5px; }
+  .sticker-wallet{
+    display:flex;align-items:center;gap:10px;
+    background:var(--c4);border:3px solid var(--line);
+    border-radius:999px;padding:8px 20px 8px 10px;
+    box-shadow:var(--shadow);
+  }
+  .sticker-wallet .coin{
+    width:44px;height:44px;border-radius:50%;background:var(--c1);
+    border:3px solid var(--line);display:grid;place-items:center;
+    font-size:22px;line-height:1;
+    transform:rotate(-8deg);
+  }
+  .sticker-wallet .count{
+    font-family:"ZCOOL QingKe HuangYou";font-size:28px;line-height:1;
+  }
+  .sticker-wallet .count small{font-size:14px;display:block;letter-spacing:.12em;margin-top:2px}
 
-    /* ===== Empty state ===== */
-    .empty-state {
-      grid-column: 1 / -1;
-      text-align: center; padding: 50px 20px; color: var(--text-muted);
-    }
-    .empty-icon { font-size: 52px; margin-bottom: 10px; }
-    .empty-state p { font-size: 15px; line-height: 1.6; }
+  /* ============== TABS ============== */
+  .tabs{
+    max-width:1240px;margin:10px auto 0;
+    padding:0 32px;
+    display:flex;gap:14px;align-items:flex-end;
+  }
+  .tab{
+    position:relative;
+    font-family:"ZCOOL QingKe HuangYou";font-size:22px;
+    padding:14px 28px 18px;
+    border:3px solid var(--line);
+    border-bottom:none;
+    border-radius:20px 20px 0 0;
+    background:var(--cream);color:var(--ink-soft);
+    margin-bottom:-3px;
+    transition:transform .15s;
+    white-space:nowrap;
+  }
+  .tab:hover{transform:translateY(-2px)}
+  .tab.active{
+    background:var(--c3);color:var(--ink);
+    z-index:2;padding-bottom:22px;
+  }
+  .tab .pip{
+    display:inline-block;width:10px;height:10px;border-radius:50%;
+    background:var(--line);margin-right:8px;vertical-align:2px;
+  }
+  .tab.active .pip{background:var(--ink)}
 
-    /* ===== FAB ===== */
-    #fab {
-      position: fixed; bottom: 22px; right: 22px;
-      width: 56px; height: 56px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--secondary), var(--primary));
-      color: #fff; font-size: 30px;
-      border: none; cursor: pointer;
-      box-shadow: 0 4px 18px rgba(255,107,107,.5);
-      display: flex; align-items: center; justify-content: center;
-      z-index: 20; transition: transform .15s;
-    }
-    #fab:active { transform: scale(.93); }
+  /* ============== PANEL ============== */
+  .panel{
+    max-width:1240px;margin:0 auto;
+    padding:28px;
+    border:3px solid var(--line);
+    background:#FFFCEA;
+    border-radius:24px;
+    box-shadow:var(--shadow-lg);
+    min-height:600px;
+  }
 
-    /* ===== Overlay + Sheet ===== */
-    .overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,.45); z-index: 50;
-      align-items: flex-end; justify-content: center;
-      padding: 0 0 0 0;
-    }
-    .overlay.show { display: flex; }
-    @media (min-width: 600px) { .overlay { align-items: center; padding: 20px; } }
-    .sheet {
-      background: #fff; border-radius: 20px 20px 0 0;
-      padding: 22px 20px 28px;
-      width: 100%; max-width: 440px;
-      animation: slideUp .25s ease;
-      max-height: 92vh; overflow-y: auto;
-    }
-    @media (min-width: 600px) { .sheet { border-radius: 20px; } }
-    @keyframes slideUp {
-      from { transform: translateY(40px); opacity: 0; }
-      to   { transform: translateY(0);    opacity: 1; }
-    }
-    .sheet-drag { width: 40px; height: 4px; background: #e0e0e0; border-radius: 4px; margin: 0 auto 18px; }
-    .sheet h2 { font-size: 17px; font-weight: 700; margin-bottom: 18px; }
+  /* ============== BENTO GRID ============== */
+  .bento{
+    display:grid;
+    grid-template-columns:repeat(12,1fr);
+    gap:14px;
+  }
+  .block{
+    position:relative;
+    border:3px solid var(--line);
+    border-radius:22px;
+    overflow:hidden;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    transition:transform .18s cubic-bezier(.3,1.5,.6,1), box-shadow .18s;
+    min-height:180px;
+    display:flex;flex-direction:column;
+  }
+  .block:hover{
+    transform:translate(-2px,-4px);
+    box-shadow:0 10px 0 var(--line);
+  }
+  .block:active{transform:translate(0,0);box-shadow:0 2px 0 var(--line)}
 
-    /* Form */
-    .form-row { margin-bottom: 14px; }
-    .form-row label {
-      display: block; font-size: 11px; font-weight: 700;
-      color: #666; margin-bottom: 5px;
-      text-transform: uppercase; letter-spacing: .5px;
-    }
-    .form-row input[type="text"],
-    .form-row input[type="number"],
-    .form-row input[type="url"] {
-      width: 100%; padding: 10px 12px;
-      border: 2px solid var(--border); border-radius: 10px;
-      font-size: 15px; outline: none;
-      transition: border-color .2s;
-      font-family: inherit; color: var(--text);
-    }
-    .form-row input:focus { border-color: var(--primary); }
-    .img-toggle {
-      display: flex; gap: 8px; margin-bottom: 8px;
-    }
-    .img-toggle-btn {
-      flex: 1; padding: 7px;
-      border: 2px solid var(--border); background: #fff;
-      border-radius: 8px; font-family: inherit;
-      font-size: 12px; font-weight: 600;
-      color: #888; cursor: pointer; transition: all .15s;
-    }
-    .img-toggle-btn.active { border-color: var(--primary); color: var(--primary); background: #fff3e0; }
-    .file-drop-zone {
-      display: block; padding: 12px 10px;
-      border: 2px dashed var(--border); border-radius: 10px;
-      text-align: center; font-size: 13px; color: #888;
-      cursor: pointer; transition: border-color .2s;
-    }
-    .file-drop-zone:hover { border-color: var(--primary); }
-    #inp-file { display: none; }
-    #img-preview {
-      width: 100%; max-height: 130px; object-fit: cover;
-      border-radius: 10px; margin-top: 8px; display: none;
-    }
-    .sheet-actions { display: flex; gap: 10px; margin-top: 20px; }
-    .btn-cancel {
-      flex: 1; padding: 11px;
-      border: 2px solid var(--border); background: #fff;
-      border-radius: 10px; font-family: inherit;
-      font-size: 14px; font-weight: 600;
-      color: #666; cursor: pointer;
-    }
-    .btn-primary {
-      flex: 2; padding: 11px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff; border: none; border-radius: 10px;
-      font-family: inherit; font-size: 14px; font-weight: 700;
-      cursor: pointer; transition: opacity .15s;
-    }
-    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
-    .btn-primary:not(:disabled):active { opacity: .85; }
+  .block .img-box{
+    flex:1;padding:18px;
+    display:grid;place-items:center;
+    background:inherit;
+    position:relative;
+  }
+  .block .img-box::after{
+    /* subtle grid dots like a lego studs plate */
+    content:'';position:absolute;inset:0;
+    background-image: radial-gradient(circle, rgba(28,24,16,.08) 1px, transparent 1.5px);
+    background-size:18px 18px;
+    pointer-events:none;
+    mix-blend-mode:multiply;
+  }
+  .block .img-box img{
+    max-height:160px;max-width:88%;
+    /* transparent PNGs — drop-shadow follows the actual silhouette */
+    filter:drop-shadow(3px 5px 0 rgba(28,24,16,.28));
+    position:relative;z-index:1;
+    transition:transform .2s;
+  }
+  .block:hover .img-box img{transform:scale(1.04) rotate(-1deg)}
 
-    /* Confirm sheet */
-    .confirm-sheet { text-align: center; }
-    .confirm-img-box {
-      width: 90px; height: 90px; border-radius: 14px;
-      overflow: hidden; margin: 0 auto 12px;
-      background: linear-gradient(135deg, #FFE8D6, #FFD6E8);
-      display: flex; align-items: center; justify-content: center;
-      font-size: 42px;
-    }
-    .confirm-img-box img { width: 100%; height: 100%; object-fit: cover; }
-    .confirm-item-name { font-size: 17px; font-weight: 700; color: var(--primary); margin-bottom: 4px; }
-    .confirm-item-cost { font-size: 14px; color: var(--gold); font-weight: 600; margin-bottom: 8px; }
-    .confirm-hint { font-size: 12px; color: var(--text-muted); margin-bottom: 18px; }
+  .block .info{
+    background:var(--ink);color:#FFF8E8;
+    padding:10px 14px;
+    border-top:3px solid var(--line);
+    display:flex;align-items:center;gap:10px;
+    min-height:60px;
+  }
+  .block .info .name{
+    flex:1;font-family:"ZCOOL KuaiLe";font-size:13px;line-height:1.25;
+    overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    letter-spacing:.02em;
+  }
+  .block .price{
+    flex-shrink:0;
+    background:var(--c1);color:var(--ink);
+    border:2px solid var(--cream);
+    border-radius:999px;padding:4px 10px 4px 8px;
+    font-family:"ZCOOL QingKe HuangYou";font-size:18px;
+    display:flex;align-items:center;gap:6px;
+    transform:rotate(3deg);
+  }
+  /* Sticker chip — replaces ★ with a tiny rotating sticker icon */
+  .sticker-chip{
+    display:inline-grid;place-items:center;
+    width:22px;height:22px;border-radius:50%;
+    border:2px solid var(--line);
+    font-size:11px;line-height:1;
+    flex-shrink:0;
+    transform:rotate(var(--rot,-6deg));
+  }
+  .sticker-chip.s-c1{background:#FFD43B}
+  .sticker-chip.s-c2{background:#FF6B6B;color:#FFF}
+  .sticker-chip.s-c3{background:#4DABF7;color:#FFF}
+  .sticker-chip.s-c4{background:#51CF66}
+  .sticker-chip.s-c5{background:#B197FC}
+  .sticker-chip.s-c6{background:#FF922B}
+  .sticker-chip.s-c7{background:#FFA8A8}
+  .sticker-chip.s-c8{background:#63E6BE}
 
-    /* Quantity stepper */
-    .qty-stepper-row {
-      margin: 4px 0 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-    }
-    .qty-stepper {
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }
-    .qty-btn {
-      width: 40px; height: 40px; border-radius: 50%;
-      background: var(--primary); color: #fff;
-      border: none; font-size: 22px; font-weight: 700;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      transition: opacity .15s; user-select: none;
-    }
-    .qty-btn:disabled { opacity: .35; cursor: not-allowed; }
-    .qty-btn:not(:disabled):active { opacity: .75; }
-    .qty-display {
-      width: 56px; text-align: center;
-      font-size: 26px; font-weight: 700; color: var(--text);
-    }
-    .qty-remaining-label {
-      font-size: 12px; color: var(--text-muted);
-    }
-    .qty-remaining-label strong { color: var(--primary); }
+  .block .stock{
+    position:absolute;top:10px;right:10px;z-index:3;
+    background:#FFF;border:2px solid var(--line);
+    border-radius:999px;padding:3px 10px;font-size:12px;
+    font-family:"Baloo 2",sans-serif;font-weight:700;
+    transform:rotate(6deg);
+  }
+  .block .stock.out{background:var(--ink);color:#FFF8E8}
 
-    /* Setup sheet */
-    .setup-step {
-      background: #fff8f4; border-radius: 12px;
-      padding: 12px 14px; margin-bottom: 10px;
-    }
-    .setup-step-num {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 22px; height: 22px; border-radius: 50%;
-      background: var(--primary); color: #fff;
-      font-size: 11px; font-weight: 700;
-      margin-right: 6px; vertical-align: middle; flex-shrink: 0;
-    }
-    .setup-step-title { font-weight: 600; font-size: 14px; vertical-align: middle; }
-    .setup-step p { font-size: 12px; color: #666; margin-top: 6px; line-height: 1.5; }
-    .setup-step a { color: var(--primary); }
-    .config-textarea {
-      width: 100%; height: 120px;
-      border: 2px solid var(--border); border-radius: 10px;
-      padding: 10px 12px; font-family: 'Menlo','Monaco','Courier New',monospace;
-      font-size: 11px; resize: vertical; outline: none;
-      margin-top: 8px; color: #333;
-    }
-    .config-textarea:focus { border-color: var(--primary); }
-    .config-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; }
-    .setup-divider { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
-    .setup-clear-btn {
-      width: 100%; padding: 9px;
-      border: 1.5px solid #ffcccc; background: #fff5f5;
-      border-radius: 10px; color: #c0392b;
-      font-family: inherit; font-size: 13px; font-weight: 600;
-      cursor: pointer; margin-top: 6px;
-    }
+  .block .heart-btn{
+    position:absolute;top:10px;left:10px;z-index:3;
+    width:34px;height:34px;border-radius:50%;
+    background:#FFF;border:2px solid var(--line);
+    display:grid;place-items:center;
+    font-size:16px;line-height:1;
+    transition:transform .15s;
+  }
+  .block .heart-btn:hover{transform:scale(1.15) rotate(-8deg)}
+  .block .heart-btn.on{background:var(--c2);color:#FFF}
 
-    /* Toast */
-    #toast {
-      position: fixed; bottom: 88px; left: 50%;
-      transform: translateX(-50%) translateY(12px);
-      background: rgba(40,40,40,.92); color: #fff;
-      padding: 9px 20px; border-radius: 20px;
-      font-size: 13px; font-weight: 500;
-      opacity: 0; transition: opacity .25s, transform .25s;
-      z-index: 200; pointer-events: none; white-space: nowrap;
-    }
-    #toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  /* Block palette assignments — cycle colors by index */
+  .block.c1{background:var(--c1)}
+  .block.c2{background:var(--c2)}
+  .block.c3{background:var(--c3)}
+  .block.c4{background:var(--c4)}
+  .block.c5{background:var(--c5)}
+  .block.c6{background:var(--c6)}
+  .block.c7{background:var(--c7)}
+  .block.c8{background:var(--c8)}
 
-    /* Loading */
-    .spinner {
-      width: 18px; height: 18px;
-      border: 2px solid rgba(255,255,255,.3); border-top-color: #fff;
-      border-radius: 50%; animation: spin .7s linear infinite;
-      display: inline-block; vertical-align: middle;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
+  /* Varied sizes — puzzle-like */
+  .block.sz-s{grid-column:span 3;min-height:220px}
+  .block.sz-m{grid-column:span 4;min-height:240px}
+  .block.sz-l{grid-column:span 4;min-height:280px}
+  .block.sz-xl{grid-column:span 6;min-height:300px}
+  .block.sz-wide{grid-column:span 6;min-height:200px}
 
-    /* ===== Ledger Tab ===== */
-    .balance-card {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      color: #fff;
-      border-radius: 18px;
-      padding: 18px 16px 16px;
-      margin-bottom: 14px;
-    }
-    .balance-card-title {
-      font-size: 11px; opacity: .7; margin-bottom: 12px;
-      letter-spacing: .8px; text-transform: uppercase;
-    }
-    .balance-main {
-      display: flex; align-items: flex-end; gap: 6px; margin-bottom: 14px;
-    }
-    .balance-main-value {
-      font-size: 52px; font-weight: 800; line-height: 1; color: #ffd700;
-    }
-    .balance-main-unit { font-size: 16px; opacity: .75; padding-bottom: 8px; }
-    .balance-stats {
-      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
-    }
-    .balance-stat {
-      background: rgba(255,255,255,.09); border-radius: 10px;
-      padding: 8px 10px; text-align: center;
-    }
-    .balance-stat-value { font-size: 16px; font-weight: 700; }
-    .balance-stat-label { font-size: 10px; opacity: .65; margin-top: 2px; }
-    .balance-stat.earn  { color: #6deba5; }
-    .balance-stat.deduct { color: #ff8a8a; }
-    .balance-stat.spent  { color: #ffb347; }
+  @media (max-width: 980px){
+    .block.sz-s{grid-column:span 6}
+    .block.sz-m{grid-column:span 6}
+    .block.sz-l{grid-column:span 6}
+    .block.sz-xl{grid-column:span 12}
+    .block.sz-wide{grid-column:span 12}
+  }
+  @media (max-width: 520px){
+    .block{grid-column:span 12 !important;min-height:220px !important}
+  }
 
-    .btn-add-ledger {
-      width: 100%; padding: 13px;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      color: #fff; border: none; border-radius: 12px;
-      font-family: inherit; font-size: 15px; font-weight: 700;
-      cursor: pointer; margin-bottom: 14px; transition: opacity .15s;
-    }
-    .btn-add-ledger:active { opacity: .85; }
+  /* Out of stock overlay */
+  .block.sold-out{opacity:.7}
+  .block.sold-out .img-box img{filter:grayscale(.6) drop-shadow(3px 5px 0 rgba(28,24,16,.22))}
+  .block.sold-out::after{
+    content:'售完啦';
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-10deg);
+    background:var(--ink);color:var(--c2);
+    padding:6px 20px;border:3px solid var(--c2);border-radius:10px;
+    font-family:"ZCOOL QingKe HuangYou";font-size:24px;z-index:4;
+    letter-spacing:.1em;
+  }
 
-    /* Ledger list */
-    .ledger-list { display: flex; flex-direction: column; gap: 8px; }
-    .ledger-entry {
-      background: var(--card-bg); border-radius: 12px; padding: 12px 14px;
-      box-shadow: var(--shadow); display: flex; align-items: center;
-      gap: 12px; position: relative;
-    }
-    .ledger-entry-icon {
-      width: 40px; height: 40px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 18px; flex-shrink: 0;
-    }
-    .ledger-entry-icon.earn   { background: #e6f9ee; }
-    .ledger-entry-icon.deduct { background: #fff0f0; }
-    .ledger-entry-content { flex: 1; min-width: 0; }
-    .ledger-entry-main {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-bottom: 2px;
-    }
-    .ledger-entry-category { font-size: 14px; font-weight: 600; color: var(--text); }
-    .ledger-entry-amount { font-size: 16px; font-weight: 800; }
-    .ledger-entry-amount.earn   { color: var(--green); }
-    .ledger-entry-amount.deduct { color: #e05a2a; }
-    .ledger-entry-meta  { font-size: 11px; color: var(--text-muted); }
-    .ledger-entry-note  { font-size: 12px; color: #888; margin-top: 3px; font-style: italic; }
-    .btn-delete-ledger {
-      position: absolute; top: 8px; right: 8px;
-      width: 22px; height: 22px; background: rgba(0,0,0,.1);
-      border: none; border-radius: 50%; color: #888; font-size: 12px;
-      cursor: pointer; display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity .15s;
-    }
-    .ledger-entry:hover .btn-delete-ledger { opacity: 1; }
-    @media (hover: none) { .btn-delete-ledger { opacity: .6; } }
+  /* ============== WISHLIST SIDEBAR (sticky) ============== */
+  .wishlist-fab{
+    position:fixed;bottom:24px;right:24px;z-index:50;
+    background:var(--c2);color:#FFF;
+    border:3px solid var(--line);border-radius:20px;
+    padding:14px 22px;
+    box-shadow:var(--shadow-lg);
+    font-family:"ZCOOL QingKe HuangYou";font-size:20px;
+    display:flex;align-items:center;gap:10px;
+    transition:transform .15s;
+  }
+  .wishlist-fab:hover{transform:translateY(-3px) rotate(-2deg)}
+  .wishlist-fab .badge{
+    background:#FFF;color:var(--c2);
+    border:2px solid var(--line);border-radius:50%;
+    width:28px;height:28px;display:grid;place-items:center;
+    font-family:"Baloo 2",sans-serif;font-weight:800;font-size:14px;
+  }
 
-    /* Operator & type toggles */
-    .operator-toggle, .type-toggle { display: flex; gap: 8px; }
-    .operator-btn, .type-btn {
-      flex: 1; padding: 9px;
-      border: 2px solid var(--border); background: #fff;
-      border-radius: 10px; font-family: inherit;
-      font-size: 14px; font-weight: 600;
-      color: #888; cursor: pointer; transition: all .15s;
-    }
-    .operator-btn.active { border-color: var(--primary); color: var(--primary); background: #f5f3ff; }
-    .type-btn.earn.active   { border-color: var(--green);  color: var(--green);  background: var(--green-bg); }
-    .type-btn.deduct.active { border-color: #e05a2a; color: #e05a2a; background: #fff5f0; }
+  .wishlist-panel{
+    position:fixed;top:0;right:-440px;width:420px;max-width:100vw;
+    height:100vh;background:var(--cream);
+    border-left:3px solid var(--line);z-index:100;
+    transition:right .3s cubic-bezier(.3,1,.3,1);
+    display:flex;flex-direction:column;
+  }
+  .wishlist-panel.open{right:0}
+  .wishlist-panel header{
+    padding:24px;border-bottom:3px solid var(--line);
+    background:var(--c5);
+    display:flex;align-items:center;gap:14px;
+  }
+  .wishlist-panel header h3{font-family:"ZCOOL QingKe HuangYou";font-size:28px}
+  .wishlist-panel header .close{
+    margin-left:auto;width:36px;height:36px;border-radius:50%;
+    background:var(--ink);color:#FFF8E8;display:grid;place-items:center;
+    border:2px solid var(--line);font-size:20px;
+  }
+  .wishlist-panel .list{
+    flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;
+  }
+  .wishlist-panel .empty{
+    text-align:center;padding:40px 20px;color:var(--ink-soft);
+    font-size:18px;
+  }
+  .wishlist-item{
+    display:flex;align-items:center;gap:12px;
+    padding:12px;background:#FFF;
+    border:3px solid var(--line);border-radius:16px;
+    box-shadow:var(--shadow);
+    position:relative;
+  }
+  .wishlist-item .priority-num{
+    width:32px;height:32px;border-radius:50%;
+    border:2px solid var(--line);
+    background:var(--c1);
+    display:grid;place-items:center;
+    font-family:"ZCOOL QingKe HuangYou";font-size:18px;
+    flex-shrink:0;
+  }
+  .wishlist-item:nth-child(1) .priority-num{background:var(--c2);color:#FFF}
+  .wishlist-item:nth-child(2) .priority-num{background:var(--c6)}
+  .wishlist-item:nth-child(3) .priority-num{background:var(--c1)}
+  .wishlist-item .thumb{
+    width:48px;height:48px;border-radius:10px;
+    border:2px solid var(--line);background:var(--bg);
+    display:grid;place-items:center;overflow:hidden;flex-shrink:0;
+  }
+  .wishlist-item .thumb img{max-width:100%;max-height:100%}
+  .wishlist-item .wi-info{flex:1;min-width:0}
+  .wishlist-item .wi-name{font-size:14px;line-height:1.3;font-family:"ZCOOL KuaiLe";margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .wishlist-item .wi-meta{font-size:12px;color:var(--ink-soft);font-family:"Baloo 2"}
+  .wishlist-item .arrows{display:flex;flex-direction:column;gap:2px}
+  .wishlist-item .arrows button{
+    width:22px;height:18px;border:2px solid var(--line);
+    background:#FFF;border-radius:6px;font-size:10px;
+    display:grid;place-items:center;
+  }
+  .wishlist-item .arrows button:hover{background:var(--c3)}
+  .wishlist-item .remove{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--c2);color:#FFF;
+    border:2px solid var(--line);display:grid;place-items:center;
+    font-size:14px;
+  }
 
-    /* Category chips */
-    .category-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
-    .chip {
-      padding: 5px 11px;
-      border: 1.5px solid var(--border); background: #fff;
-      border-radius: 20px; font-family: inherit;
-      font-size: 12px; font-weight: 500;
-      color: #555; cursor: pointer; transition: all .15s;
-      white-space: nowrap;
-    }
-    .chip.active {
-      border-color: var(--primary); color: var(--primary);
-      background: #f5f3ff; font-weight: 700;
-    }
-  </style>
+  /* ============== MODAL ============== */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(28,24,16,.45);
+    z-index:200;display:none;align-items:center;justify-content:center;
+    padding:20px;
+  }
+  .modal-backdrop.open{display:flex}
+  .modal{
+    background:var(--cream);border:3px solid var(--line);
+    border-radius:28px;box-shadow:0 10px 0 var(--line);
+    max-width:480px;width:100%;
+    overflow:hidden;
+    animation:modalIn .25s cubic-bezier(.3,1.4,.5,1);
+  }
+  @keyframes modalIn{
+    from{transform:translateY(40px) scale(.9);opacity:0}
+    to{transform:translateY(0) scale(1);opacity:1}
+  }
+  .modal .m-top{
+    padding:30px;background:var(--c3);
+    border-bottom:3px solid var(--line);
+    display:grid;place-items:center;position:relative;
+    min-height:220px;
+  }
+  .modal .m-top::before{
+    content:'';position:absolute;inset:0;
+    background-image:radial-gradient(circle, rgba(28,24,16,.12) 1.5px, transparent 2px);
+    background-size:22px 22px;
+  }
+  .modal .m-top img{
+    max-height:180px;position:relative;z-index:1;
+    filter:drop-shadow(4px 6px 0 rgba(28,24,16,.25));
+  }
+  .modal .m-body{padding:24px}
+  .modal h2{font-family:"ZCOOL QingKe HuangYou";font-size:24px;line-height:1.3;margin-bottom:8px}
+  .modal .price-tag{
+    display:inline-flex;align-items:center;gap:10px;
+    background:var(--c1);border:3px solid var(--line);border-radius:12px;
+    padding:6px 14px 6px 8px;margin-bottom:20px;
+    font-family:"ZCOOL QingKe HuangYou";font-size:22px;
+  }
+  .modal .price-tag .sticker-chip{width:28px;height:28px;font-size:14px}
+  .modal .qty-row{
+    display:flex;align-items:center;gap:14px;
+    padding:14px;background:#FFF;border:3px solid var(--line);border-radius:14px;
+    margin-bottom:16px;
+  }
+  .modal .qty-row label{flex:1;font-size:16px;color:var(--ink-soft)}
+  .modal .qty-ctrl{
+    display:flex;align-items:center;gap:8px;
+    background:var(--bg);border:2px solid var(--line);border-radius:999px;
+    padding:4px;
+  }
+  .modal .qty-ctrl button{
+    width:32px;height:32px;border-radius:50%;
+    background:var(--c4);border:2px solid var(--line);
+    font-family:"ZCOOL QingKe HuangYou";font-size:20px;
+    line-height:1;display:grid;place-items:center;
+  }
+  .modal .qty-ctrl button:disabled{background:var(--ink-soft);opacity:.5;cursor:not-allowed}
+  .modal .qty-ctrl .n{
+    font-family:"ZCOOL QingKe HuangYou";font-size:22px;min-width:32px;text-align:center;
+  }
+  .modal .total-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:14px 18px;background:var(--c1);
+    border:3px solid var(--line);border-radius:14px;margin-bottom:18px;
+  }
+  .modal .total-row .lbl{font-size:16px;color:var(--ink)}
+  .modal .total-row .val{font-family:"ZCOOL QingKe HuangYou";font-size:28px}
+
+  .modal .m-actions{display:flex;gap:12px}
+  .modal .btn{
+    flex:1;padding:16px;border:3px solid var(--line);border-radius:16px;
+    font-family:"ZCOOL QingKe HuangYou";font-size:22px;
+    box-shadow:var(--shadow);
+    transition:transform .1s, box-shadow .1s;
+  }
+  .modal .btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--line)}
+  .modal .btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--line)}
+  .modal .btn.primary{background:var(--c2);color:#FFF}
+  .modal .btn.ghost{background:#FFF}
+  .modal .btn:disabled{background:var(--ink-soft);color:#FFF;cursor:not-allowed;box-shadow:var(--shadow)}
+
+  /* ============== TOAST ============== */
+  .toast-layer{position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:300;pointer-events:none}
+  .toast{
+    background:var(--c4);border:3px solid var(--line);border-radius:16px;
+    padding:14px 22px;box-shadow:var(--shadow);
+    font-family:"ZCOOL QingKe HuangYou";font-size:20px;
+    display:flex;align-items:center;gap:10px;
+    animation:toastIn .3s cubic-bezier(.2,1.5,.5,1), toastOut .3s 2s forwards;
+  }
+  @keyframes toastIn{from{transform:translateY(-40px);opacity:0} to{transform:translateY(0);opacity:1}}
+  @keyframes toastOut{to{transform:translateY(-40px);opacity:0}}
+
+  /* Floating sticker bursts on redeem */
+  .burst{position:fixed;pointer-events:none;z-index:999;font-size:32px;animation:burst 1.2s ease-out forwards}
+  @keyframes burst{
+    0%{transform:translate(0,0) scale(.6);opacity:1}
+    100%{transform:translate(var(--dx),var(--dy)) scale(1.2) rotate(var(--r));opacity:0}
+  }
+
+  /* ============== HISTORY ============== */
+  .history-grid{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;
+  }
+  .h-card{
+    background:#FFF;border:3px solid var(--line);border-radius:20px;
+    box-shadow:var(--shadow);
+    padding:14px;display:flex;gap:14px;align-items:center;
+    position:relative;
+  }
+  .h-card .h-thumb{
+    width:70px;height:70px;border-radius:14px;border:3px solid var(--line);
+    overflow:hidden;display:grid;place-items:center;flex-shrink:0;
+  }
+  .h-card:nth-child(6n+1) .h-thumb{background:var(--c1)}
+  .h-card:nth-child(6n+2) .h-thumb{background:var(--c3)}
+  .h-card:nth-child(6n+3) .h-thumb{background:var(--c4)}
+  .h-card:nth-child(6n+4) .h-thumb{background:var(--c5)}
+  .h-card:nth-child(6n+5) .h-thumb{background:var(--c6)}
+  .h-card:nth-child(6n)   .h-thumb{background:var(--c7)}
+  .h-card .h-thumb img{max-width:90%;max-height:90%}
+  .h-card .h-name{font-family:"ZCOOL KuaiLe";font-size:16px;line-height:1.3;flex:1}
+  .h-card .h-meta{margin-top:6px;font-size:13px;color:var(--ink-soft);font-family:"Baloo 2"}
+  .h-card .h-meta .sticker-chip{width:18px;height:18px;font-size:9px;vertical-align:-3px;margin:0 2px}
+
+  /* ============== HISTORY STATS BAR ============== */
+  .h-stats{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+    margin-bottom:24px;
+  }
+  .h-stat{
+    background:#FFF;border:3px solid var(--line);border-radius:20px;
+    box-shadow:var(--shadow);padding:18px 20px;
+    display:flex;align-items:center;gap:14px;
+    position:relative;overflow:hidden;
+  }
+  .h-stat .h-stat-icon{
+    width:54px;height:54px;border-radius:16px;
+    border:3px solid var(--line);
+    display:grid;place-items:center;font-size:28px;
+    flex-shrink:0;
+    transform:rotate(-5deg);
+  }
+  .h-stat:nth-child(1) .h-stat-icon{background:var(--c1)}
+  .h-stat:nth-child(2) .h-stat-icon{background:var(--c2)}
+  .h-stat:nth-child(3) .h-stat-icon{background:var(--c4)}
+  .h-stat .h-stat-num{
+    font-family:"ZCOOL QingKe HuangYou";font-size:36px;line-height:1;
+  }
+  .h-stat .h-stat-lbl{
+    font-size:13px;color:var(--ink-soft);margin-top:4px;letter-spacing:.04em;
+  }
+  @media (max-width:680px){
+    .h-stats{grid-template-columns:1fr}
+  }
+  .h-card .h-badge{
+    position:absolute;top:-10px;right:14px;
+    background:var(--ink);color:var(--c1);
+    padding:4px 10px;border:2px solid var(--line);border-radius:8px;
+    font-family:"ZCOOL QingKe HuangYou";font-size:16px;
+    transform:rotate(4deg);
+  }
+  .h-empty{text-align:center;padding:80px 20px;color:var(--ink-soft);font-size:18px}
+
+  /* Month separator */
+  .h-month{
+    grid-column:1/-1;
+    font-family:"ZCOOL QingKe HuangYou";font-size:22px;
+    color:var(--ink);margin-top:14px;
+    padding-left:14px;border-left:6px solid var(--c2);
+  }
+  .h-month:first-child{margin-top:0}
+
+  /* Confetti elements */
+  .confetti-dots{position:absolute;pointer-events:none}
+
+  /* Tiny brick decoration at title */
+  .brick-dots{
+    display:inline-flex;gap:4px;vertical-align:middle;margin-left:6px;
+  }
+  .brick-dots span{
+    width:8px;height:8px;border-radius:50%;background:var(--line);display:inline-block;
+  }
+
+  /* ============== SYNC STATUS LIGHT ============== */
+  .sync-light{
+    position:fixed;bottom:24px;left:24px;z-index:80;
+    display:flex;align-items:center;gap:8px;
+    background:#FFF;border:3px solid var(--line);border-radius:999px;
+    padding:6px 14px 6px 8px;
+    box-shadow:var(--shadow);
+    font-family:"Baloo 2",sans-serif;font-weight:700;font-size:12px;
+    letter-spacing:.04em;
+    cursor:pointer;
+    user-select:none;
+  }
+  .sync-light .dot{
+    width:14px;height:14px;border-radius:50%;
+    border:2px solid var(--line);
+    background:#9E9E9E;
+    flex-shrink:0;
+    position:relative;
+  }
+  .sync-light.synced .dot{background:#51CF66;box-shadow:0 0 0 0 rgba(81,207,102,.6);animation:pulseGreen 2.4s ease-out infinite}
+  .sync-light.syncing .dot{background:#FFD43B;animation:pulseYellow 1s ease-in-out infinite}
+  .sync-light.offline .dot{background:#FF6B6B}
+  @keyframes pulseGreen{0%{box-shadow:0 0 0 0 rgba(81,207,102,.6)}70%{box-shadow:0 0 0 8px rgba(81,207,102,0)}100%{box-shadow:0 0 0 0 rgba(81,207,102,0)}}
+  @keyframes pulseYellow{0%,100%{opacity:1}50%{opacity:.5}}
+  .sync-light .lbl{color:var(--ink-soft)}
+
+  /* ============== PARENT GEAR ============== */
+  .parent-gear{
+    position:fixed;top:28px;right:24px;z-index:60;
+    width:42px;height:42px;border-radius:50%;
+    background:#FFF;border:3px solid var(--line);
+    box-shadow:var(--shadow);
+    display:grid;place-items:center;font-size:20px;
+    transition:transform .3s;
+  }
+  .parent-gear:hover{transform:rotate(60deg)}
+
+  /* PIN modal */
+  .pin-modal{text-align:center;padding:30px}
+  .pin-modal h2{font-family:"ZCOOL QingKe HuangYou";font-size:26px;margin-bottom:8px}
+  .pin-modal .hint{color:var(--ink-soft);font-size:14px;margin-bottom:22px}
+  .pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:24px}
+  .pin-dots .pd{
+    width:46px;height:54px;border:3px solid var(--line);border-radius:12px;
+    background:var(--bg);display:grid;place-items:center;
+    font-family:"ZCOOL QingKe HuangYou";font-size:30px;
+  }
+  .pin-dots .pd.filled{background:var(--c1)}
+  .pin-dots .pd.error{background:var(--c2);color:#FFF;animation:shake .4s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  .pin-pad{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:280px;margin:0 auto;
+  }
+  .pin-pad button{
+    padding:14px;border:3px solid var(--line);border-radius:14px;
+    background:#FFF;font-family:"ZCOOL QingKe HuangYou";font-size:24px;
+    box-shadow:var(--shadow);
+    transition:transform .1s,box-shadow .1s;
+  }
+  .pin-pad button:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--line)}
+  .pin-pad button:active{transform:translateY(2px);box-shadow:0 2px 0 var(--line)}
+  .pin-pad .pin-clear{background:var(--c2);color:#FFF}
+  .pin-pad .pin-back{background:var(--c5)}
+
+  /* Parent panel (full overlay) */
+  .parent-panel{
+    position:fixed;inset:0;z-index:150;background:var(--bg);
+    overflow-y:auto;display:none;
+  }
+  .parent-panel.open{display:block}
+  .parent-panel .pp-head{
+    position:sticky;top:0;z-index:5;
+    background:var(--c5);border-bottom:3px solid var(--line);
+    padding:18px 28px;display:flex;align-items:center;gap:14px;
+  }
+  .parent-panel .pp-head h2{font-family:"ZCOOL QingKe HuangYou";font-size:26px}
+  .parent-panel .pp-head .pp-tag{
+    background:var(--ink);color:var(--c1);padding:4px 12px;border-radius:8px;
+    font-size:13px;letter-spacing:.1em;font-family:"Baloo 2";font-weight:700;
+  }
+  .parent-panel .pp-close{margin-left:auto;width:38px;height:38px;border-radius:50%;background:#FFF;border:3px solid var(--line);font-size:20px;display:grid;place-items:center}
+  .parent-panel .pp-body{max-width:1080px;margin:0 auto;padding:24px 28px 80px}
+
+  .pp-section{
+    background:#FFF;border:3px solid var(--line);border-radius:20px;
+    padding:20px 22px;margin-bottom:18px;box-shadow:var(--shadow);
+  }
+  .pp-section h3{
+    font-family:"ZCOOL QingKe HuangYou";font-size:22px;margin-bottom:14px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .pp-section h3 .ico{
+    width:32px;height:32px;border-radius:8px;border:2px solid var(--line);
+    display:grid;place-items:center;font-size:16px;
+  }
+
+  /* Balance editor */
+  .bal-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+  .bal-row .big{font-family:"ZCOOL QingKe HuangYou";font-size:42px;min-width:120px}
+  .bal-row input{
+    border:3px solid var(--line);border-radius:12px;padding:8px 12px;
+    font-family:"ZCOOL QingKe HuangYou";font-size:24px;width:120px;
+    background:var(--bg);
+  }
+  .bal-row button{
+    padding:10px 16px;border:3px solid var(--line);border-radius:12px;
+    background:var(--c1);font-family:"ZCOOL QingKe HuangYou";font-size:18px;
+    box-shadow:0 3px 0 var(--line);
+  }
+  .bal-row button:hover{transform:translateY(-1px);box-shadow:0 4px 0 var(--line)}
+  .bal-row button.minus{background:var(--c2);color:#FFF}
+  .bal-row button.plus{background:var(--c4)}
+  .bal-row button.set{background:var(--c3);color:#FFF}
+
+  /* Item editor list */
+  .pp-item{
+    display:flex;align-items:center;gap:12px;
+    padding:12px;background:var(--bg);
+    border:3px solid var(--line);border-radius:14px;
+    margin-bottom:10px;
+  }
+  .pp-item .pi-thumb{
+    width:60px;height:60px;border-radius:10px;border:2px solid var(--line);
+    display:grid;place-items:center;flex-shrink:0;background:var(--c1);overflow:hidden;
+  }
+  .pp-item .pi-thumb img{max-width:90%;max-height:90%}
+  .pp-item .pi-name{flex:1;min-width:0;font-family:"ZCOOL KuaiLe";font-size:14px;line-height:1.3;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .pp-item input[type="number"]{
+    width:64px;border:2px solid var(--line);border-radius:8px;padding:6px;
+    font-family:"ZCOOL QingKe HuangYou";font-size:16px;text-align:center;background:#FFF;
+  }
+  .pp-item .pi-stickers,.pp-item .pi-qty{display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0}
+  .pp-item .pi-stickers small,.pp-item .pi-qty small{font-size:10px;color:var(--ink-soft);font-family:"Baloo 2";font-weight:700;letter-spacing:.05em}
+  .pp-item .pi-edit,.pp-item .pi-delete{
+    width:36px;height:36px;border-radius:10px;border:2px solid var(--line);
+    display:grid;place-items:center;font-size:14px;flex-shrink:0;
+  }
+  .pp-item .pi-edit{background:var(--c3);color:#FFF}
+  .pp-item .pi-delete{background:var(--c2);color:#FFF}
+
+  /* Add new item form */
+  .add-form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .add-form .full{grid-column:1/-1}
+  .add-form label{font-size:13px;color:var(--ink-soft);margin-bottom:4px;display:block;font-family:"Baloo 2";font-weight:700;letter-spacing:.05em}
+  .add-form input[type="text"], .add-form input[type="number"]{
+    width:100%;border:3px solid var(--line);border-radius:12px;padding:10px 12px;
+    font-family:"ZCOOL KuaiLe";font-size:16px;background:var(--bg);
+  }
+  .add-form .img-drop{
+    border:3px dashed var(--line);border-radius:14px;
+    padding:16px;text-align:center;background:var(--bg);
+    cursor:pointer;transition:background .15s;
+    min-height:120px;display:grid;place-items:center;
+  }
+  .add-form .img-drop:hover{background:var(--cream)}
+  .add-form .img-drop.has{padding:8px;background:var(--c1)}
+  .add-form .img-drop img{max-height:100px}
+  .add-form .add-btn{
+    grid-column:1/-1;
+    padding:14px;background:var(--c4);border:3px solid var(--line);border-radius:14px;
+    font-family:"ZCOOL QingKe HuangYou";font-size:22px;box-shadow:var(--shadow);
+  }
+  .add-form .add-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--line)}
+  .add-form .add-btn:disabled{background:var(--ink-soft);color:#FFF;cursor:not-allowed}
+  @media (max-width:600px){.add-form{grid-template-columns:1fr}}
+
+  /* PIN change form */
+  .pin-change{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .pin-change input{
+    border:3px solid var(--line);border-radius:12px;padding:8px 12px;
+    font-family:"ZCOOL QingKe HuangYou";font-size:20px;width:100px;
+    text-align:center;background:var(--bg);letter-spacing:.3em;
+  }
+  .pin-change button{
+    padding:10px 18px;background:var(--c3);color:#FFF;
+    border:3px solid var(--line);border-radius:12px;
+    font-family:"ZCOOL QingKe HuangYou";font-size:16px;
+    box-shadow:0 3px 0 var(--line);
+  }
+</style>
 </head>
 <body>
 
-<!-- ===== Header ===== -->
-<header class="app-header">
-  <div class="app-header-title">
-    <h1>🏷️ 豆豆贴纸奖励</h1>
-    <p>记录贴纸 · 积累 · 兑换好礼物</p>
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-mark">豆豆</div>
+    <div class="logo-text">
+      <h1>奖励兑换商店</h1>
+    </div>
   </div>
-  <button class="btn-sync-setup" id="btn-sync" onclick="openSetupModal()">
-    <span class="sync-dot off" id="sync-dot"></span>
-    <span id="sync-label">云同步</span>
-  </button>
-</header>
-
-<!-- ===== Tabs ===== -->
-<nav>
-  <button class="tab-btn active" id="tab-catalog" onclick="switchTab('catalog')">🎁 兑换商店</button>
-  <button class="tab-btn" id="tab-history" onclick="switchTab('history')">📋 兑换历史</button>
-  <button class="tab-btn" id="tab-ledger"  onclick="switchTab('ledger')">🏷️ 贴纸账本</button>
-</nav>
-
-<!-- ===== Catalog Page ===== -->
-<div id="page-catalog" class="page active">
-  <div class="grid-wrap">
-    <div id="catalog-grid" class="grid"></div>
+  <div class="topbar-spacer"></div>
+  <div class="sticker-wallet" title="我的贴纸">
+    <div class="coin" id="walletChip"></div>
+    <div class="count"><span id="stickerBalance">128</span><small>我的贴纸</small></div>
   </div>
 </div>
 
-<!-- ===== History Page ===== -->
-<div id="page-history" class="page">
-  <div class="grid-wrap">
-    <div id="history-summary" style="display:none"></div>
-    <div id="history-grid" class="grid"></div>
+<div class="tabs">
+  <button class="tab active" data-tab="store"><span class="pip"></span>奖励仓库</button>
+  <button class="tab" data-tab="history"><span class="pip"></span>兑换记录</button>
+</div>
+
+<div class="panel">
+  <!-- Store grid -->
+  <div id="storeView">
+    <div class="bento" id="bentoGrid"></div>
+  </div>
+  <!-- History -->
+  <div id="historyView" style="display:none">
+    <div class="h-stats" id="historyStats"></div>
+    <div class="history-grid" id="historyGrid"></div>
   </div>
 </div>
 
-<!-- ===== Ledger Page ===== -->
-<div id="page-ledger" class="page">
-  <div class="grid-wrap">
-    <div id="ledger-balance-card" class="balance-card"></div>
-    <button class="btn-add-ledger" onclick="openLedgerModal()">✏️ 添加贴纸记录</button>
-    <div id="ledger-list" class="ledger-list"></div>
-  </div>
+<!-- Wishlist FAB -->
+<button class="wishlist-fab" id="wishBtn">
+  ❤ 心愿单
+  <span class="badge" id="wishCount">0</span>
+</button>
+
+<!-- Wishlist panel -->
+<div class="wishlist-panel" id="wishPanel">
+  <header>
+    <div style="font-size:32px">❤</div>
+    <h3>我的心愿单</h3>
+    <button class="close" id="wishClose">×</button>
+  </header>
+  <div class="list" id="wishList"></div>
 </div>
 
-<!-- ===== FAB ===== -->
-<button id="fab" onclick="openAddModal()" title="添加新商品">＋</button>
-
-<!-- ===== Add Item Modal ===== -->
-<div class="overlay" id="overlay-add" onclick="overlayClick(event,'add')">
-  <div class="sheet">
-    <div class="sheet-drag"></div>
-    <h2>✨ 添加新商品</h2>
-    <div class="form-row">
-      <label>商品名称 *</label>
-      <input type="text" id="inp-name" placeholder="例如：乐高积木套装" />
-    </div>
-    <div class="form-row">
-      <label>所需贴纸数量 *</label>
-      <input type="number" id="inp-stickers" placeholder="例如：10" min="1" step="1" />
-    </div>
-    <div class="form-row">
-      <label>库存数量（共几个）</label>
-      <input type="number" id="inp-quantity" placeholder="例如：5，留空默认为 1" min="1" step="1" />
-    </div>
-    <div class="form-row">
-      <label>商品图片（可选）</label>
-      <div class="img-toggle">
-        <button class="img-toggle-btn active" id="btn-type-url" onclick="setImgType('url')">🔗 网络链接</button>
-        <button class="img-toggle-btn" id="btn-type-upload" onclick="setImgType('upload')">📷 本地图片</button>
-      </div>
-      <div id="sec-url">
-        <input type="url" id="inp-url" placeholder="粘贴图片地址" oninput="onUrlInput()" />
-      </div>
-      <div id="sec-upload" style="display:none">
-        <label class="file-drop-zone" for="inp-file" id="file-label">📁 点击选择图片</label>
-        <input type="file" id="inp-file" accept="image/*" onchange="onFileSelect(event)" />
-      </div>
-      <img id="img-preview" alt="preview" />
-    </div>
-    <div class="sheet-actions">
-      <button class="btn-cancel" onclick="closeAddModal()">取消</button>
-      <button class="btn-primary" id="btn-save" onclick="saveItem()">添加商品</button>
-    </div>
-  </div>
+<!-- Redeem modal -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal" id="modal"></div>
 </div>
 
-<!-- ===== Confirm Redeem Modal ===== -->
-<div class="overlay" id="overlay-confirm" onclick="overlayClick(event,'confirm')">
-  <div class="sheet confirm-sheet">
-    <div class="sheet-drag"></div>
-    <h2>确认兑换？</h2>
-    <div class="confirm-img-box" id="confirm-img-box">🎁</div>
-    <p class="confirm-item-name" id="confirm-name"></p>
-    <p class="confirm-item-cost" id="confirm-cost"></p>
-    <!-- Quantity stepper (only shown when quantity > 1) -->
-    <div class="qty-stepper-row" id="qty-stepper-row" style="display:none">
-      <div class="qty-stepper">
-        <button class="qty-btn" id="qty-btn-minus" onclick="changeRedeemQty(-1)">−</button>
-        <span class="qty-display" id="qty-display">1</span>
-        <button class="qty-btn" id="qty-btn-plus" onclick="changeRedeemQty(1)">＋</button>
-      </div>
-      <p class="qty-remaining-label" id="qty-remaining-label"></p>
-    </div>
-    <p class="confirm-hint" id="confirm-hint">兑换后将移至历史记录</p>
-    <div class="sheet-actions">
-      <button class="btn-cancel" onclick="closeConfirmModal()">再想想</button>
-      <button class="btn-primary" id="btn-do-redeem" onclick="executeRedeem()">🎉 确认兑换！</button>
-    </div>
-  </div>
+<!-- Toasts -->
+<div class="toast-layer" id="toastLayer"></div>
+
+<!-- Sync status indicator (bottom-left) -->
+<div class="sync-light synced" id="syncLight" title="点击查看同步状态">
+  <div class="dot"></div>
+  <span class="lbl" id="syncLabel">本地模式</span>
 </div>
 
-<!-- ===== Setup / Sync Modal ===== -->
-<div class="overlay" id="overlay-setup" onclick="overlayClick(event,'setup')">
-  <div class="sheet" id="sheet-setup">
-    <div class="sheet-drag"></div>
-    <h2>☁️ 云同步状态</h2>
-    <div id="sync-status-box" style="text-align:center;padding:20px 0 10px">
-      <div id="sync-status-icon" style="font-size:40px;margin-bottom:8px">⏳</div>
-      <div id="sync-status-text" style="font-size:14px;color:#555">正在连接...</div>
-    </div>
-    <div class="sheet-actions" style="margin-top:16px">
-      <button class="btn-cancel" onclick="closeSetupModal()">关闭</button>
-    </div>
+<!-- Parent mode gear -->
+<button class="parent-gear" id="parentGear" title="家长模式">⚙</button>
+
+<!-- Parent panel (hidden until PIN unlocked) -->
+<div class="parent-panel" id="parentPanel">
+  <div class="pp-head">
+    <h2>家长模式</h2>
+    <span class="pp-tag">PARENT</span>
+    <button class="pp-close" id="ppClose">×</button>
   </div>
+  <div class="pp-body" id="ppBody"></div>
 </div>
 
-<!-- ===== Add Ledger Entry Modal ===== -->
-<div class="overlay" id="overlay-ledger" onclick="overlayClick(event,'ledger')">
-  <div class="sheet">
-    <div class="sheet-drag"></div>
-    <h2>✏️ 添加贴纸记录</h2>
-
-    <div class="form-row">
-      <label>操作者</label>
-      <div class="operator-toggle">
-        <button class="operator-btn active" id="op-dad" onclick="selectOperator('爸爸')">👨 爸爸</button>
-        <button class="operator-btn" id="op-mom" onclick="selectOperator('妈妈')">👩 妈妈</button>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <label>类型</label>
-      <div class="type-toggle">
-        <button class="type-btn earn active" id="type-earn"   onclick="selectLedgerType('earn')">➕ 奖励</button>
-        <button class="type-btn deduct"      id="type-deduct" onclick="selectLedgerType('deduct')">➖ 扣除</button>
-      </div>
-    </div>
-
-    <div class="form-row">
-      <label>分类（点击选择）</label>
-      <div id="category-chips" class="category-chips"></div>
-    </div>
-
-    <div class="form-row">
-      <label>贴纸数量 *</label>
-      <input type="number" id="ledger-inp-stickers" placeholder="例如：5" min="1" step="1" />
-    </div>
-
-    <div class="form-row">
-      <label>备注（可选）</label>
-      <input type="text" id="ledger-inp-note" placeholder="可以写更多说明..." maxlength="100" />
-    </div>
-
-    <div class="sheet-actions">
-      <button class="btn-cancel" onclick="closeLedgerModal()">取消</button>
-      <button class="btn-primary" id="btn-save-ledger" onclick="saveLedgerEntry()">✓ 确认添加</button>
-    </div>
-  </div>
-</div>
-
-<!-- ===== Toast ===== -->
-<div id="toast"></div>
-
-<!-- Supabase SDK -->
+<script src="seed-data.js"></script>
+<script src="config.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-
 <script>
-/* ============================================================
-   State
-============================================================ */
-let items   = [];
-let history = [];
-let ledger  = [];
-let pendingRedeemId  = null;
-let pendingRedeemQty = 1;
-let imgType = 'url';
-let uploadedData = null;
-
-/* Ledger modal state */
-let ledgerOperator = '爸爸';
-let ledgerType     = 'earn';
-let ledgerCategory = '';
-
-/* Historical totals before ledger tracking started */
-const HISTORICAL_EARN   = 722;   // 建账前累计获得总量
-const HISTORICAL_DEDUCT = 158;   // 建账前累计扣除总量
-const HISTORICAL_REDEEM = 457;   // 建账前已兑换但无详细记录部分（551 总计 − 94 已追踪 = 457）
-
-const EARN_CATEGORIES = [
-  { emoji: '📚', name: '认真做作业' },
-  { emoji: '🏠', name: '主动做家务' },
-  { emoji: '🍚', name: '好好吃饭'   },
-  { emoji: '😴', name: '按时睡觉'   },
-  { emoji: '🌟', name: '表现特别棒' },
-  { emoji: '💪', name: '勇敢挑战'   },
-  { emoji: '❤️', name: '帮助别人'   },
-  { emoji: '🎁', name: '特别奖励'   },
-  { emoji: '🪥', name: '自己洗漱'   },
-  { emoji: '🧸', name: '收拾玩具'   },
-  { emoji: '🏫', name: '提早到学校' },
-];
-const DEDUCT_CATEGORIES = [
-  { emoji: '😤', name: '乱发脾气'   },
-  { emoji: '🙅', name: '不听话'     },
-  { emoji: '🤥', name: '撒谎'       },
-  { emoji: '📺', name: '超时看屏幕' },
-  { emoji: '😠', name: '打人欺负人' },
-  { emoji: '🗑️', name: '不收拾东西' },
-  { emoji: '⏰', name: '上学迟到'   },
-];
-const SUPABASE_URL = 'https://agyzwlrnrqlxvegzlsvr.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFneXp3bHJucnFseHZlZ3psc3ZyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIzNDMyMzIsImV4cCI6MjA4NzkxOTIzMn0.rWmKQFkwDVr9NHxQsrTLmtuqKrR95O03N6QWJYlchlo';
-let sbClient  = null;
-let sbChannel = null;
-
-/* ============================================================
-   Supabase
-============================================================ */
-function rowToItem(row) {
-  return {
-    id: row.id, name: row.name, stickers: row.stickers,
-    quantity: row.quantity ?? 1,
-    imageUrl: row.image_url, imageData: row.image_data,
-    createdAt: row.created_at, redeemedAt: row.redeemed_at,
-    redeemedQty: row.redeemed_qty ?? 1
-  };
+/* ============ SUPABASE CONFIG ============ */
+if (!window.CONFIG || !window.CONFIG.SUPABASE_URL || !window.CONFIG.SUPABASE_ANON_KEY ||
+    window.CONFIG.SUPABASE_URL.includes('YOUR_PROJECT_REF')) {
+  document.body.innerHTML =
+    '<div style="padding:40px;font-family:system-ui,sans-serif;line-height:1.6;max-width:640px;margin:40px auto;color:#1C1810">' +
+    '<h2 style="margin-bottom:12px">⚙️ 配置缺失 / Missing config</h2>' +
+    '<p>请复制 <code>config.example.js</code> 为 <code>config.js</code>，填入你的 Supabase <code>URL</code> 和 <code>anon key</code>。</p>' +
+    '<p>Copy <code>config.example.js</code> to <code>config.js</code> and fill in your own Supabase URL &amp; anon key.</p>' +
+    '<p>详情见 <code>README.md</code>。</p>' +
+    '</div>';
+  throw new Error('Missing or template config.js — see README');
 }
-function itemToRow(item) {
-  return {
-    id: item.id, name: item.name, stickers: item.stickers,
-    quantity: item.quantity ?? 1,
-    image_url: item.imageUrl || null, image_data: item.imageData || null,
-    created_at: item.createdAt
-  };
-}
-function histToRow(entry) {
-  return {
-    id: entry.id, name: entry.name, stickers: entry.stickers,
-    redeemed_qty: entry.redeemedQty ?? 1,
-    image_url: entry.imageUrl || null, image_data: entry.imageData || null,
-    created_at: entry.createdAt, redeemed_at: entry.redeemedAt
-  };
-}
+const SUPABASE_URL = window.CONFIG.SUPABASE_URL;
+const SUPABASE_ANON_KEY = window.CONFIG.SUPABASE_ANON_KEY;
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-async function tryInitSupabase() {
-  try {
-    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    // Load both in parallel, then render ledger once both are ready
-    await Promise.all([loadFromSupabase(), loadLedgerFromSupabase()]);
-    renderLedger();
-    subscribeSupabase();
-    setSyncIndicator(true);
-    return true;
-  } catch(e) {
-    console.warn('Supabase init failed', e);
-    setSyncIndicator(false);
-    return false;
-  }
-}
+/* ============ SUPABASE STATE I/O ============ */
+let _booted = false;
+let _pushing = false;
+let _pendingPush = false;
+let _dbItemIds = new Set();
+let _dbWishIds = new Set();
+let _dbRedIds  = new Set();
 
-async function loadFromSupabase() {
-  const [r1, r2] = await Promise.all([
-    sbClient.from('sticker_items').select('*').order('created_at'),
-    sbClient.from('sticker_history').select('*').order('redeemed_at')
+async function loadFromSupabase(){
+  const [iRes, wRes, hRes, bRes] = await Promise.all([
+    sb.from('items').select('*').order('sort_order', { ascending: true }),
+    sb.from('wishlist').select('*').order('position', { ascending: true }),
+    sb.from('redemptions').select('*').order('redeemed_at', { ascending: false }),
+    sb.from('wallet').select('*').eq('id', 1).single(),
   ]);
-  if (!r2.error) { history = (r2.data || []).map(rowToItem); renderHistory(); }
-  if (!r1.error) {
-    const sbItems = (r1.data || []).map(rowToItem);
-    const sbIds   = new Set(sbItems.map(i => i.id));
-    // Also exclude seed IDs already in history (old-code redeems used same ID in history)
-    const histIds = new Set((r2.data || []).map(r => r.id));
-    const missing = SEED_ITEMS.filter(i => !sbIds.has(i.id) && !histIds.has(i.id));
-    if (missing.length > 0) {
-      // Prefer locally-saved version (preserves quantity updates) over raw seed defaults
-      const localSaved = JSON.parse(localStorage.getItem('s_items') || '[]');
-      const localById  = Object.fromEntries(localSaved.map(i => [i.id, i]));
-      const missingWithLocal = missing.map(i => localById[i.id] || i);
-      sbClient.from('sticker_items').upsert(missingWithLocal.map(itemToRow)); // fire and forget
-      items = [...sbItems, ...missingWithLocal];
-    } else {
-      items = sbItems;
-    }
-    renderCatalog();
-  }
+  if (iRes.error) throw iRes.error;
+  if (wRes.error) throw wRes.error;
+  if (hRes.error) throw hRes.error;
+  if (bRes.error) throw bRes.error;
+  items = iRes.data.map(r => ({
+    id: r.id, name: r.name, stickers: r.stickers, quantity: r.quantity, imageUrl: r.image_url,
+  }));
+  wishlist = wRes.data.map(r => r.item_id);
+  history = hRes.data.map(r => ({
+    id: r.id, itemId: r.item_id, name: r.name, stickers: r.stickers,
+    redeemedQty: r.redeemed_qty, imageUrl: r.image_url,
+    redeemedAt: new Date(r.redeemed_at).getTime(),
+  }));
+  balance = bRes.data.balance;
+  pin = bRes.data.pin || '0000';
+  _dbItemIds = new Set(items.map(i => i.id));
+  _dbWishIds = new Set(wishlist);
+  _dbRedIds  = new Set(history.map(h => h.id));
 }
 
-function subscribeSupabase() {
-  if (sbChannel) sbChannel.unsubscribe();
-  sbChannel = sbClient.channel('db-changes')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'sticker_items' },   () => loadFromSupabase())
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'sticker_history' }, () => loadFromSupabase().then(() => renderLedger()))
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'sticker_ledger' },  () => loadLedgerFromSupabase())
-    .subscribe();
-}
-
-function isSupabaseMode() { return !!sbClient; }
-
-function setSyncIndicator(on) {
-  document.getElementById('sync-dot').className = 'sync-dot' + (on ? '' : ' off');
-  document.getElementById('sync-label').textContent = on ? '已同步' : '云同步';
-}
-
-/* ============================================================
-   Local Storage
-============================================================ */
-function loadLocal() {
+async function saveState(){
+  if (!_booted) return;
+  if (_pushing) { _pendingPush = true; return; }
+  _pushing = true;
+  setSyncStatus('syncing', '保存中…');
   try {
-    items   = JSON.parse(localStorage.getItem('s_items')   || '[]');
-    history = JSON.parse(localStorage.getItem('s_history') || '[]');
-    ledger  = JSON.parse(localStorage.getItem('s_ledger')  || '[]');
-  } catch(e) { items = []; history = []; ledger = []; }
-}
-function saveLocal() {
-  localStorage.setItem('s_items',   JSON.stringify(items));
-  localStorage.setItem('s_history', JSON.stringify(history));
-  localStorage.setItem('s_ledger',  JSON.stringify(ledger));
-}
-
-/* ============================================================
-   CRUD
-============================================================ */
-async function addItem(item) {
-  if (isSupabaseMode()) {
-    const { error } = await sbClient.from('sticker_items').upsert(itemToRow(item));
-    if (error) { showToast('❌ 添加失败，请重试'); throw error; }
-  } else {
-    items.push(item);
-    saveLocal();
-    renderCatalog();
-  }
-}
-
-async function removeItem(id) {
-  if (isSupabaseMode()) {
-    const { error } = await sbClient.from('sticker_items').delete().eq('id', id);
-    if (error) { showToast('❌ 删除失败，请重试'); return; }
-  } else {
-    items = items.filter(i => i.id !== id);
-    saveLocal();
-    renderCatalog();
-  }
-}
-
-async function redeemItem(id, qty) {
-  const item = items.find(i => i.id === id);
-  if (!item) return;
-
-  const remaining = (item.quantity ?? 1) - qty;
-
-  // Always create a history entry for this redemption
-  const histEntry = {
-    id: genId(),
-    name: item.name,
-    stickers: item.stickers,
-    redeemedQty: qty,
-    imageUrl: item.imageUrl,
-    imageData: item.imageData,
-    createdAt: item.createdAt,
-    redeemedAt: Date.now()
-  };
-
-  if (isSupabaseMode()) {
-    // Optimistic local update — UI responds immediately
-    history.push(histEntry);
-    item.quantity = Math.max(0, remaining);
-    saveLocal();
-    renderCatalog();
-    renderHistory();
-
-    // STEP 1: INSERT history FIRST (the critical record)
-    const histRow = histToRow(histEntry);
-    let { error: histErr } = await sbClient.from('sticker_history').insert(histRow);
-    if (histErr) {
-      // Fallback without redeemed_qty column
-      const fallback = { ...histRow };
-      delete fallback.redeemed_qty;
-      ({ error: histErr } = await sbClient.from('sticker_history').insert(fallback));
+    const memItemIds = new Set(items.map(i => i.id));
+    const itemDeletes = [..._dbItemIds].filter(id => !memItemIds.has(id));
+    if (items.length) {
+      const { error } = await sb.from('items').upsert(items.map((i, idx) => ({
+        id: i.id, name: i.name, stickers: i.stickers, quantity: i.quantity,
+        image_url: i.imageUrl, sort_order: idx,
+      })));
+      if (error) throw error;
     }
-    if (histErr) {
-      // Rollback optimistic update — history insert failed
-      history = history.filter(h => h.id !== histEntry.id);
-      item.quantity = (item.quantity ?? 0) + qty;
-      saveLocal();
-      renderCatalog();
-      renderHistory();
-      showToast('❌ 兑换失败，请检查网络后重试');
-      return false;
+    if (itemDeletes.length) {
+      const { error } = await sb.from('items').delete().in('id', itemDeletes);
+      if (error) throw error;
+    }
+    _dbItemIds = memItemIds;
+
+    const memWish = new Set(wishlist);
+    const wishDeletes = [..._dbWishIds].filter(id => !memWish.has(id));
+    if (wishDeletes.length) {
+      const { error } = await sb.from('wishlist').delete().in('item_id', wishDeletes);
+      if (error) throw error;
+    }
+    if (wishlist.length) {
+      const { error } = await sb.from('wishlist').upsert(
+        wishlist.map((id, idx) => ({ item_id: id, position: idx }))
+      );
+      if (error) throw error;
+    }
+    _dbWishIds = memWish;
+
+    {
+      const { error } = await sb.from('wallet').update({ balance, pin }).eq('id', 1);
+      if (error) throw error;
     }
 
-    // STEP 2: UPDATE quantity (history already recorded, so data is safe)
-    const { error: qtyErr } = await sbClient.from('sticker_items')
-      .update({ quantity: Math.max(0, remaining) }).eq('id', id);
-    if (qtyErr) console.error('Quantity update failed:', qtyErr.message);
-
-    // Final sync
-    await loadFromSupabase();
-  } else {
-    history.push(histEntry);
-    item.quantity = Math.max(0, remaining);
-    saveLocal();
-    renderCatalog();
-    renderHistory();
-  }
-  return true;
-}
-
-/* ============================================================
-   Image Handling
-============================================================ */
-function compressImage(file, maxSide = 600, quality = 0.75) {
-  return new Promise(resolve => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      const img = new Image();
-      img.onload = () => {
-        const scale = Math.min(maxSide / img.width, maxSide / img.height, 1);
-        const w = Math.round(img.width * scale);
-        const h = Math.round(img.height * scale);
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-async function uploadImageToStorage(file, itemId) {
-  if (!sbClient) return null;
-  try {
-    const path = `sticker_shop/${itemId}`;
-    const { error } = await sbClient.storage.from('sticker-images').upload(path, file, { upsert: true });
-    if (error) throw error;
-    const { data } = sbClient.storage.from('sticker-images').getPublicUrl(path);
-    return data.publicUrl;
-  } catch(e) {
-    console.warn('Storage upload failed', e);
-    return null;
-  }
-}
-
-/* ============================================================
-   Render
-============================================================ */
-function fmtDate(ts) {
-  if (!ts) return '';
-  const d = new Date(ts);
-  return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
-}
-
-function imgHtml(item, placeholderEmoji = '🎁') {
-  const src = item.imageData || item.imageUrl;
-  if (src) {
-    return `<img class="card-img" src="${escHtml(src)}" alt="" loading="lazy"
-              onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'card-img-placeholder',textContent:'${placeholderEmoji}'}))">`;
-  }
-  return `<div class="card-img-placeholder">${placeholderEmoji}</div>`;
-}
-
-function stockBadgeHtml(quantity) {
-  const q = quantity ?? 1;
-  if (q === 1) return '';
-  const cls = q <= 2 ? 'stock-badge low' : 'stock-badge';
-  return `<div class="${cls}">📦 剩余 ${q} 个</div>`;
-}
-
-function renderCatalog() {
-  const grid = document.getElementById('catalog-grid');
-  const visible = items.filter(i => (i.quantity ?? 1) > 0);
-  if (visible.length === 0) {
-    grid.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">🎁</div>
-      <p>还没有商品<br>点击右下角 ＋ 来添加吧！</p>
-    </div>`;
-    return;
-  }
-  grid.innerHTML = visible.map(item => `
-    <div class="card-wrapper">
-      <div class="card">
-        ${imgHtml(item)}
-        <div class="card-body">
-          <p class="card-name">${escHtml(item.name)}</p>
-          <div class="sticker-badge">⭐ ${item.stickers} 张贴纸</div>
-          ${stockBadgeHtml(item.quantity)}
-          <p class="added-date">添加于 ${fmtDate(item.createdAt)}</p>
-          <button class="btn-redeem" onclick="openConfirmModal('${item.id}')">兑 换</button>
-        </div>
-      </div>
-      <button class="btn-delete-card" onclick="deleteItem('${item.id}')" title="删除商品">✕</button>
-    </div>
-  `).join('');
-}
-
-function renderHistory() {
-  const grid    = document.getElementById('history-grid');
-  const summary = document.getElementById('history-summary');
-
-  if (history.length === 0) {
-    summary.style.display = 'none';
-    grid.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">📭</div>
-      <p>还没有兑换记录</p>
-    </div>`;
-    return;
-  }
-
-  // Total items and stickers (tracked records only)
-  const totalItems    = history.reduce((sum, i) => sum + (i.redeemedQty ?? 1), 0);
-  const trackedStickers = history.reduce((sum, i) => sum + (i.stickers || 0) * (i.redeemedQty ?? 1), 0);
-  // Include pre-system historical redemptions so totals match the ledger
-  const totalStickers = HISTORICAL_REDEEM + trackedStickers;
-  summary.style.display = 'flex';
-  summary.innerHTML = `
-    <div>
-      <div class="sum-label">🎉 共兑换 ${totalItems} 件商品</div>
-      ${HISTORICAL_REDEEM > 0 ? `<div style="font-size:0.72em;color:#aaa;margin-top:2px">（另有建账前 ${HISTORICAL_REDEEM} 张历史记录）</div>` : ''}
-    </div>
-    <div style="text-align:right">
-      <div class="sum-label">累计消耗贴纸</div>
-      <div class="sum-value">⭐ ${totalStickers} 张</div>
-    </div>`;
-
-  const sorted = [...history].sort((a, b) => b.redeemedAt - a.redeemedAt);
-  grid.innerHTML = sorted.map(item => {
-    const qty = item.redeemedQty ?? 1;
-    const totalCost = item.stickers * qty;
-    return `
-    <div class="card-wrapper">
-      <div class="card card-history">
-        ${imgHtml(item)}
-        <div class="card-body">
-          <div class="tag-redeemed">✓ 已兑换 ${qty > 1 ? qty + ' 个' : ''}</div>
-          <p class="card-name">${escHtml(item.name)}</p>
-          <div class="sticker-badge">⭐ ${totalCost} 张贴纸</div>
-          <p class="redeemed-date">兑换于 ${fmtDate(item.redeemedAt)}</p>
-          <p class="added-date">添加于 ${fmtDate(item.createdAt)}</p>
-        </div>
-      </div>
-      <button class="btn-delete-card" onclick="deleteHistoryItem('${item.id}')" title="删除记录">✕</button>
-    </div>`;
-  }).join('');
-}
-
-/* ============================================================
-   Tab navigation
-============================================================ */
-function switchTab(tab) {
-  ['catalog','history','ledger'].forEach(t => {
-    document.getElementById(`page-${t}`).classList.toggle('active', t === tab);
-    document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
-  });
-  document.getElementById('fab').style.display = tab === 'catalog' ? '' : 'none';
-  if (tab === 'history') renderHistory();
-  if (tab === 'ledger')  renderLedger();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-/* ============================================================
-   Add Item Modal
-============================================================ */
-function openAddModal() {
-  resetAddForm();
-  showOverlay('add');
-}
-function closeAddModal() { hideOverlay('add'); }
-
-function resetAddForm() {
-  document.getElementById('inp-name').value = '';
-  document.getElementById('inp-stickers').value = '';
-  document.getElementById('inp-quantity').value = '';
-  document.getElementById('inp-url').value = '';
-  document.getElementById('inp-file').value = '';
-  document.getElementById('img-preview').style.display = 'none';
-  document.getElementById('file-label').textContent = '📁 点击选择图片';
-  uploadedData = null;
-  setImgType('url');
-}
-
-function setImgType(type) {
-  imgType = type;
-  document.getElementById('sec-url').style.display    = type === 'url'    ? '' : 'none';
-  document.getElementById('sec-upload').style.display = type === 'upload' ? '' : 'none';
-  document.getElementById('btn-type-url').classList.toggle('active', type === 'url');
-  document.getElementById('btn-type-upload').classList.toggle('active', type === 'upload');
-  document.getElementById('img-preview').style.display = 'none';
-  uploadedData = null;
-}
-
-function onUrlInput() {
-  const url = document.getElementById('inp-url').value.trim();
-  const p = document.getElementById('img-preview');
-  if (url) { p.src = url; p.style.display = 'block'; p.onerror = () => p.style.display = 'none'; }
-  else p.style.display = 'none';
-}
-
-async function onFileSelect(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const data = await compressImage(file);
-  uploadedData = data;
-  const p = document.getElementById('img-preview');
-  p.src = data; p.style.display = 'block';
-  document.getElementById('file-label').textContent = '✅ ' + file.name;
-}
-
-async function saveItem() {
-  const name     = document.getElementById('inp-name').value.trim();
-  const stickers = parseInt(document.getElementById('inp-stickers').value, 10);
-  const qtyVal   = document.getElementById('inp-quantity').value.trim();
-  const quantity = qtyVal ? parseInt(qtyVal, 10) : 1;
-  if (!name)             { showToast('请输入商品名称'); return; }
-  if (!stickers || stickers < 1) { showToast('请输入有效的贴纸数量'); return; }
-  if (quantity < 1)      { showToast('库存数量至少为 1'); return; }
-
-  const btn = document.getElementById('btn-save');
-  btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>';
-
-  const id = genId();
-  let imageUrl  = null;
-  let imageData = null;
-
-  if (imgType === 'url') {
-    imageUrl = document.getElementById('inp-url').value.trim() || null;
-  } else if (uploadedData) {
-    if (isSupabaseMode()) {
-      const fileInput = document.getElementById('inp-file');
-      const file = fileInput.files[0];
-      if (file) {
-        const url = await uploadImageToStorage(file, id);
-        if (url) imageUrl = url;
-        else imageData = uploadedData;
-      }
-    } else {
-      imageData = uploadedData;
+    const newRecs = history.filter(h => !_dbRedIds.has(h.id));
+    if (newRecs.length) {
+      const payload = newRecs.map(h => ({
+        item_id: h.itemId || null,
+        name: h.name, stickers: h.stickers,
+        redeemed_qty: h.redeemedQty,
+        image_url: h.imageUrl,
+        redeemed_at: new Date(h.redeemedAt).toISOString(),
+      }));
+      const { data, error } = await sb.from('redemptions').insert(payload).select();
+      if (error) throw error;
+      data.forEach((row, i) => {
+        const local = newRecs[i];
+        local.id = row.id;
+        _dbRedIds.add(row.id);
+      });
     }
-  }
 
-  const item = { id, name, stickers, quantity, imageUrl, imageData, createdAt: Date.now() };
-
-  try {
-    await addItem(item);
-    closeAddModal();
-    showToast('🎉 商品已添加！');
-  } catch(e) {
-    // error toast already shown in addItem
+    setSyncStatus('synced', '已同步');
+  } catch (e) {
+    console.error('saveState failed', e);
+    setSyncStatus('offline', '离线');
   } finally {
-    btn.disabled = false;
-    btn.textContent = '添加商品';
+    _pushing = false;
+    if (_pendingPush) { _pendingPush = false; saveState(); }
   }
 }
 
-/* ============================================================
-   Delete Item
-============================================================ */
-async function deleteItem(id) {
-  const item = items.find(i => i.id === id);
-  const name = item ? `「${item.name}」` : '这个商品';
-  if (!confirm(`确定要删除 ${name} 吗？`)) return;
-  await removeItem(id);
-  showToast('商品已删除');
+async function uploadImageToStorage(dataUrl, id){
+  const blob = await (await fetch(dataUrl)).blob();
+  const path = `item_${id}.png`;
+  const { error } = await sb.storage.from('item-images').upload(path, blob, {
+    upsert: true, contentType: 'image/png',
+  });
+  if (error) throw error;
+  return sb.storage.from('item-images').getPublicUrl(path).data.publicUrl;
 }
 
-async function deleteHistoryItem(id) {
-  const item = history.find(i => i.id === id);
-  const name = item ? `「${item.name}」` : '这条兑换记录';
-  if (!confirm(`确定要删除 ${name} 的兑换记录吗？`)) return;
-  if (isSupabaseMode()) {
-    const { error } = await sbClient.from('sticker_history').delete().eq('id', id);
-    if (error) { showToast('❌ 删除失败，请重试'); return; }
-  } else {
-    history = history.filter(i => i.id !== id);
-    saveLocal();
-    renderHistory();
-  }
-  showToast('记录已删除');
+let pin = '0000';
+
+/* ============ STICKER ICONS ============ */
+// Pool of sticker icons & color variants — pick one per item deterministically
+const STICKER_GLYPHS = ['☺','★','♥','✿','✦','♪','☀','◉','✶','♣','✚','❉'];
+const STICKER_COLORS = ['s-c1','s-c2','s-c3','s-c4','s-c5','s-c6','s-c7','s-c8'];
+function stickerFor(seed, sizeClass=''){
+  // Deterministic hash from string seed
+  let h = 0;
+  const s = String(seed);
+  for (let i = 0; i < s.length; i++) h = (h*31 + s.charCodeAt(i)) >>> 0;
+  const g = STICKER_GLYPHS[h % STICKER_GLYPHS.length];
+  const c = STICKER_COLORS[(h >> 4) % STICKER_COLORS.length];
+  const rot = ((h >> 8) % 31) - 15; // -15..+15deg
+  return `<span class="sticker-chip ${c} ${sizeClass}" style="--rot:${rot}deg">${g}</span>`;
 }
 
-/* ============================================================
-   Redeem
-============================================================ */
-function openConfirmModal(id) {
-  const item = items.find(i => i.id === id);
-  if (!item) return;
-  pendingRedeemId  = id;
-  pendingRedeemQty = 1;
+/* ============ STATE ============ */
+let items = [], history = [], wishlist = [], balance = 0;
+let currentTab = 'store';
+let pendingId = null;
+let pendingQty = 1;
 
-  const box = document.getElementById('confirm-img-box');
-  const src = item.imageData || item.imageUrl;
-  if (src) {
-    box.innerHTML = `<img src="${escHtml(src)}" alt="" onerror="this.parentElement.innerHTML='🎁'">`;
-  } else {
-    box.textContent = '🎁';
-  }
-  document.getElementById('confirm-name').textContent = item.name;
+/* ============ LAYOUT: size + color cycle ============ */
+// Create a pleasing, varied bento layout for 15 items
+const LAYOUT = [
+  {sz:'sz-m',  c:'c1'}, // 0 - yellow
+  {sz:'sz-m',  c:'c3'}, // 1 - sky
+  {sz:'sz-m',  c:'c2'}, // 2 - tomato (wide top row end = 4+4+4=12)
+  {sz:'sz-s',  c:'c4'}, // 3 - grass
+  {sz:'sz-s',  c:'c5'}, // 4 - grape
+  {sz:'sz-xl', c:'c6'}, // 5 - tangerine (xl=6, row=3+3+6=12)
+  {sz:'sz-m',  c:'c7'}, // 6 - pink
+  {sz:'sz-m',  c:'c8'}, // 7 - mint
+  {sz:'sz-m',  c:'c1'}, // 8 - yellow
+  {sz:'sz-wide',c:'c3'}, // 9 - sky wide
+  {sz:'sz-s',  c:'c2'}, // 10 - tomato
+  {sz:'sz-s',  c:'c4'}, // 11 - grass
+  {sz:'sz-l',  c:'c5'}, // 12 - grape
+  {sz:'sz-l',  c:'c6'}, // 13 - orange (4+4=8, + span 4?)
+  {sz:'sz-l',  c:'c7'}, // 14 - pink
+];
 
-  const qty = item.quantity ?? 1;
+/* ============ RENDER STORE ============ */
+function renderStore(){
+  const grid = document.getElementById('bentoGrid');
+  grid.innerHTML = items.map((it, idx) => {
+    const L = LAYOUT[idx] || {sz:'sz-m', c:'c1'};
+    const inWish = wishlist.includes(it.id);
+    const sold = it.quantity <= 0;
+    return `
+      <div class="block ${L.sz} ${L.c} ${sold?'sold-out':''}" data-id="${it.id}">
+        <button class="heart-btn ${inWish?'on':''}" data-heart="${it.id}" title="${inWish?'移出心愿单':'加入心愿单'}">${inWish?'♥':'♡'}</button>
+        <div class="stock ${sold?'out':''}">${sold? '售完' : '×'+it.quantity}</div>
+        <div class="img-box"><img src="${it.imageUrl}" alt="${escHtml(it.name)}" loading="lazy"></div>
+        <div class="info">
+          <div class="name">${escHtml(it.name)}</div>
+          <div class="price">${stickerFor(it.id)}${it.stickers}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
 
-  // Show/hide stepper
-  const stepperRow = document.getElementById('qty-stepper-row');
-  if (qty > 1) {
-    stepperRow.style.display = '';
-    document.getElementById('qty-display').textContent = '1';
-    updateConfirmCost(item, 1);
-    updateStepperButtons(1, qty);
-  } else {
-    stepperRow.style.display = 'none';
-    updateConfirmCost(item, 1);
-  }
-
-  // Update hint text
-  document.getElementById('confirm-hint').textContent =
-    qty <= 1 ? '兑换后将移至历史记录' : '兑换后库存将相应减少';
-
-  showOverlay('confirm');
+  // click handlers
+  grid.querySelectorAll('.block').forEach(b => {
+    b.addEventListener('click', (e) => {
+      if (e.target.closest('[data-heart]')) return;
+      const id = b.dataset.id;
+      if (b.classList.contains('sold-out')) {
+        showToast('已经卖完啦～', '😢');
+        return;
+      }
+      openModal(id);
+    });
+  });
+  grid.querySelectorAll('[data-heart]').forEach(h => {
+    h.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleWish(h.dataset.heart);
+    });
+  });
 }
 
-function updateConfirmCost(item, qty) {
-  const totalCost = item.stickers * qty;
-  document.getElementById('confirm-cost').textContent =
-    qty > 1
-      ? `⭐ 每个 ${item.stickers} 张 × ${qty} 个 = ${totalCost} 张贴纸`
-      : `⭐ 需要 ${item.stickers} 张贴纸`;
-  const remaining = (item.quantity ?? 1) - qty;
-  const lbl = document.getElementById('qty-remaining-label');
-  if (lbl) {
-    lbl.innerHTML = remaining > 0
-      ? `兑换后还剩 <strong>${remaining}</strong> 个`
-      : `兑换后库存清零`;
-  }
-}
-
-function updateStepperButtons(qty, max) {
-  document.getElementById('qty-btn-minus').disabled = qty <= 1;
-  document.getElementById('qty-btn-plus').disabled  = qty >= max;
-}
-
-function changeRedeemQty(delta) {
-  const item = items.find(i => i.id === pendingRedeemId);
-  if (!item) return;
-  const max = item.quantity ?? 1;
-  pendingRedeemQty = Math.max(1, Math.min(max, pendingRedeemQty + delta));
-  document.getElementById('qty-display').textContent = pendingRedeemQty;
-  updateConfirmCost(item, pendingRedeemQty);
-  updateStepperButtons(pendingRedeemQty, max);
-}
-
-function closeConfirmModal() {
-  hideOverlay('confirm');
-  pendingRedeemId  = null;
-  pendingRedeemQty = 1;
-}
-
-async function executeRedeem() {
-  if (!pendingRedeemId) return;
-  const btn = document.getElementById('btn-do-redeem');
-  btn.disabled = true;
-  const ok = await redeemItem(pendingRedeemId, pendingRedeemQty);
-  btn.disabled = false;
-  if (!ok) return;  // redeemItem already showed error toast and rolled back
-  const qty = pendingRedeemQty;
-  closeConfirmModal();
-  showToast(qty > 1 ? `🎊 成功兑换 ${qty} 个！` : '🎊 兑换成功！已记录到历史');
-}
-
-/* ============================================================
-   Setup / Sync Modal
-============================================================ */
-function openSetupModal() {
-  const on = !!sbClient;
-  document.getElementById('sync-status-icon').textContent = on ? '✅' : '❌';
-  document.getElementById('sync-status-text').textContent = on
-    ? '已连接云端，所有设备自动同步'
-    : '未连接，请检查网络后刷新页面';
-  showOverlay('setup');
-}
-function closeSetupModal() { hideOverlay('setup'); }
-
-/* ============================================================
-   Overlay helpers
-============================================================ */
-function showOverlay(name) { document.getElementById(`overlay-${name}`).classList.add('show'); }
-function hideOverlay(name) { document.getElementById(`overlay-${name}`).classList.remove('show'); }
-function overlayClick(e, name) {
-  if (e.target === document.getElementById(`overlay-${name}`)) {
-    if (name === 'add')     closeAddModal();
-    if (name === 'confirm') closeConfirmModal();
-    if (name === 'setup')   closeSetupModal();
-    if (name === 'ledger')  closeLedgerModal();
-  }
-}
-
-/* ============================================================
-   Utilities
-============================================================ */
-function genId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
-
-function escHtml(str) {
-  const d = document.createElement('div');
-  d.textContent = String(str);
-  return d.innerHTML;
-}
-
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
-}
-
-/* ============================================================
-   Ledger — balance helpers
-============================================================ */
-function calcBalance() {
-  const newEarned   = ledger.filter(e => e.type === 'earn').reduce((s, e) => s + (e.stickers || 0), 0);
-  const newDeducted = ledger.filter(e => e.type === 'deduct').reduce((s, e) => s + (e.stickers || 0), 0);
-  const totalEarned   = HISTORICAL_EARN + newEarned;
-  const totalDeducted = HISTORICAL_DEDUCT + newDeducted;
-  // Count ALL redemptions: historical baseline + tracked records
-  const trackedRedeemed = history.reduce((s, h) => s + (h.stickers || 0) * (h.redeemedQty ?? 1), 0);
-  const totalRedeemed = HISTORICAL_REDEEM + trackedRedeemed;
-  const balance = totalEarned - totalDeducted - totalRedeemed;
-  return { totalEarned, totalDeducted, totalRedeemed, balance };
-}
-
-/* ============================================================
-   Ledger — render
-============================================================ */
-function renderLedger() {
-  const { totalEarned, totalDeducted, totalRedeemed, balance } = calcBalance();
-  const balCard = document.getElementById('ledger-balance-card');
-  if (!balCard) return;
-
-  const balColor = balance >= 0 ? '#ffd700' : '#ff8a8a';
-  balCard.innerHTML = `
-    <div class="balance-card-title">🏷️ 豆豆的贴纸账本</div>
-    <div class="balance-main">
-      <div class="balance-main-value" style="color:${balColor}">${balance}</div>
-      <div class="balance-main-unit">张 · 当前余额</div>
+/* ============ RENDER HISTORY ============ */
+function renderHistoryStats(){
+  const stats = document.getElementById('historyStats');
+  if (history.length === 0) { stats.innerHTML = ''; return; }
+  const totalItems = history.reduce((s,h) => s + h.redeemedQty, 0);
+  const totalSpent = history.reduce((s,h) => s + h.stickers * h.redeemedQty, 0);
+  // most-redeemed item name
+  const counts = {};
+  history.forEach(h => { counts[h.name] = (counts[h.name]||0) + h.redeemedQty; });
+  const fav = Object.entries(counts).sort((a,b) => b[1]-a[1])[0];
+  const favShort = fav ? (fav[0].length > 10 ? fav[0].slice(0,9)+'…' : fav[0]) : '—';
+  stats.innerHTML = `
+    <div class="h-stat">
+      <div class="h-stat-icon">🎁</div>
+      <div><div class="h-stat-num">${totalItems}</div><div class="h-stat-lbl">件 · 累计兑换</div></div>
     </div>
-    <div class="balance-stats">
-      <div class="balance-stat earn">
-        <div class="balance-stat-value">${totalEarned}</div>
-        <div class="balance-stat-label">累计获得</div>
-      </div>
-      <div class="balance-stat deduct">
-        <div class="balance-stat-value">${totalDeducted}</div>
-        <div class="balance-stat-label">累计扣除</div>
-      </div>
-      <div class="balance-stat spent">
-        <div class="balance-stat-value">${totalRedeemed}</div>
-        <div class="balance-stat-label">累计兑换</div>
-      </div>
-    </div>`;
+    <div class="h-stat">
+      <div class="h-stat-icon">${stickerFor('total-spent-'+totalSpent).replace('sticker-chip','sticker-chip').replace('class="sticker-chip', 'style="transform:none" class="sticker-chip')}</div>
+      <div><div class="h-stat-num">${totalSpent}</div><div class="h-stat-lbl">张 · 花费贴纸</div></div>
+    </div>
+    <div class="h-stat">
+      <div class="h-stat-icon">⭐</div>
+      <div><div class="h-stat-num" style="font-size:22px;line-height:1.1">${escHtml(favShort)}</div><div class="h-stat-lbl">最爱兑换 · ${fav?fav[1]:0}件</div></div>
+    </div>
+  `;
+}
 
-  const list = document.getElementById('ledger-list');
-  if (!list) return;
-  if (ledger.length === 0) {
-    list.innerHTML = `<div class="empty-state">
-      <div class="empty-icon">📔</div>
-      <p>还没有贴纸记录<br>点击上方按钮来添加！</p>
-    </div>`;
+function renderHistory(){
+  renderHistoryStats();
+  const grid = document.getElementById('historyGrid');
+  if (history.length === 0) {
+    grid.innerHTML = `<div class="h-empty">还没有兑换记录哦<br>去商店选一个心仪的奖励吧～ 🎁</div>`;
     return;
   }
-  const allCats = [...EARN_CATEGORIES, ...DEDUCT_CATEGORIES];
-  const sorted  = [...ledger].sort((a, b) => b.createdAt - a.createdAt);
-  list.innerHTML = sorted.map(entry => {
-    const isEarn = entry.type === 'earn';
-    const catObj = allCats.find(c => c.name === entry.category);
-    const emoji  = catObj ? catObj.emoji : (isEarn ? '⭐' : '📉');
-    return `
-    <div class="ledger-entry">
-      <div class="ledger-entry-icon ${isEarn ? 'earn' : 'deduct'}">${emoji}</div>
-      <div class="ledger-entry-content">
-        <div class="ledger-entry-main">
-          <span class="ledger-entry-category">${escHtml(entry.category)}</span>
-          <span class="ledger-entry-amount ${isEarn ? 'earn' : 'deduct'}">${isEarn ? '+' : '−'}${entry.stickers}</span>
+  // sort desc
+  const sorted = [...history].sort((a,b) => b.redeemedAt - a.redeemedAt);
+  // group by month
+  const groups = {};
+  sorted.forEach(h => {
+    const d = new Date(h.redeemedAt);
+    const key = `${d.getFullYear()}年${d.getMonth()+1}月`;
+    (groups[key] = groups[key] || []).push(h);
+  });
+  const html = Object.entries(groups).map(([month, arr]) => {
+    return `<div class="h-month">${month}</div>` + arr.map(h => `
+      <div class="h-card">
+        <div class="h-badge">×${h.redeemedQty}</div>
+        <div class="h-thumb"><img src="${h.imageUrl}" alt=""></div>
+        <div style="flex:1;min-width:0">
+          <div class="h-name">${escHtml(h.name)}</div>
+          <div class="h-meta">兑换于 ${fmtAgo(h.redeemedAt)} · 花费 ${h.stickers * h.redeemedQty} ${stickerFor(h.id)}</div>
         </div>
-        <div class="ledger-entry-meta">${escHtml(entry.operator)} · ${fmtDate(entry.createdAt)}</div>
-        ${entry.note ? `<div class="ledger-entry-note">${escHtml(entry.note)}</div>` : ''}
       </div>
-      <button class="btn-delete-ledger" onclick="deleteLedgerEntry('${entry.id}')" title="删除">✕</button>
-    </div>`;
+    `).join('');
   }).join('');
+  grid.innerHTML = html;
 }
 
-/* ============================================================
-   Ledger — modal
-============================================================ */
-function openLedgerModal() {
-  ledgerOperator = '爸爸';
-  ledgerType     = 'earn';
-  ledgerCategory = '';
-  document.getElementById('ledger-inp-stickers').value = '';
-  document.getElementById('ledger-inp-note').value     = '';
-  updateOperatorUI();
-  updateLedgerTypeUI();
-  showOverlay('ledger');
-}
-function closeLedgerModal() { hideOverlay('ledger'); }
-
-function selectOperator(op) {
-  ledgerOperator = op;
-  updateOperatorUI();
-}
-function updateOperatorUI() {
-  document.getElementById('op-dad').classList.toggle('active', ledgerOperator === '爸爸');
-  document.getElementById('op-mom').classList.toggle('active', ledgerOperator === '妈妈');
+/* ============ WISHLIST ============ */
+function toggleWish(id){
+  const i = wishlist.indexOf(id);
+  if (i >= 0) wishlist.splice(i, 1);
+  else wishlist.push(id);
+  renderStore();
+  renderWishlist();
+  document.getElementById('wishCount').textContent = wishlist.length;
+  saveState();
 }
 
-function selectLedgerType(type) {
-  ledgerType     = type;
-  ledgerCategory = '';
-  updateLedgerTypeUI();
-}
-function updateLedgerTypeUI() {
-  document.getElementById('type-earn').classList.toggle('active',   ledgerType === 'earn');
-  document.getElementById('type-deduct').classList.toggle('active', ledgerType === 'deduct');
-  renderCategoryChips();
-}
-
-function renderCategoryChips() {
-  const cats = ledgerType === 'earn' ? EARN_CATEGORIES : DEDUCT_CATEGORIES;
-  document.getElementById('category-chips').innerHTML = cats.map(c => `
-    <button class="chip ${ledgerCategory === c.name ? 'active' : ''}"
-      onclick="selectCategory('${c.name}')">${c.emoji} ${c.name}</button>
-  `).join('');
+function moveWish(id, dir){
+  const i = wishlist.indexOf(id);
+  if (i < 0) return;
+  const j = i + dir;
+  if (j < 0 || j >= wishlist.length) return;
+  [wishlist[i], wishlist[j]] = [wishlist[j], wishlist[i]];
+  renderWishlist();
+  saveState();
 }
 
-function selectCategory(name) {
-  ledgerCategory = ledgerCategory === name ? '' : name;
-  renderCategoryChips();
+function renderWishlist(){
+  const list = document.getElementById('wishList');
+  document.getElementById('wishCount').textContent = wishlist.length;
+  if (wishlist.length === 0) {
+    list.innerHTML = `<div class="empty">还没有心愿～<br>点击商品上的♡把它加进来吧</div>`;
+    return;
+  }
+  list.innerHTML = wishlist.map((id, idx) => {
+    const it = items.find(x => x.id === id);
+    if (!it) return '';
+    return `
+      <div class="wishlist-item">
+        <div class="priority-num">${idx+1}</div>
+        <div class="thumb"><img src="${it.imageUrl}" alt=""></div>
+        <div class="wi-info">
+          <div class="wi-name">${escHtml(it.name)}</div>
+          <div class="wi-meta">${it.stickers} ★ · 库存 ${it.quantity}</div>
+        </div>
+        <div class="arrows">
+          <button data-wish-up="${it.id}" title="上移">▲</button>
+          <button data-wish-down="${it.id}" title="下移">▼</button>
+        </div>
+        <button class="remove" data-wish-remove="${it.id}">×</button>
+      </div>
+    `;
+  }).join('');
+  list.querySelectorAll('[data-wish-up]').forEach(b => b.addEventListener('click', () => moveWish(b.dataset.wishUp, -1)));
+  list.querySelectorAll('[data-wish-down]').forEach(b => b.addEventListener('click', () => moveWish(b.dataset.wishDown, +1)));
+  list.querySelectorAll('[data-wish-remove]').forEach(b => b.addEventListener('click', () => toggleWish(b.dataset.wishRemove)));
 }
 
-async function saveLedgerEntry() {
-  if (!ledgerCategory) { showToast('请先选择一个分类'); return; }
-  const stickers = parseInt(document.getElementById('ledger-inp-stickers').value, 10);
-  if (!stickers || stickers < 1) { showToast('请输入有效的贴纸数量'); return; }
-  const note = document.getElementById('ledger-inp-note').value.trim();
+/* ============ MODAL ============ */
+function openModal(id){
+  const it = items.find(x => x.id === id);
+  if (!it) return;
+  pendingId = id;
+  pendingQty = 1;
+  renderModal();
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+function closeModal(){
+  document.getElementById('modalBackdrop').classList.remove('open');
+  pendingId = null;
+}
+function renderModal(){
+  const it = items.find(x => x.id === pendingId);
+  if (!it) return;
+  const total = it.stickers * pendingQty;
+  const canAfford = balance >= total;
+  const maxQty = it.quantity;
+  const modal = document.getElementById('modal');
+  modal.innerHTML = `
+    <div class="m-top"><img src="${it.imageUrl}" alt=""></div>
+    <div class="m-body">
+      <h2>${escHtml(it.name)}</h2>
+      <div class="price-tag">${stickerFor(it.id)} ${it.stickers} 贴纸/个</div>
+      <div class="qty-row">
+        <label>兑换数量</label>
+        <div class="qty-ctrl">
+          <button id="qtyMinus" ${pendingQty<=1?'disabled':''}>−</button>
+          <div class="n">${pendingQty}</div>
+          <button id="qtyPlus" ${pendingQty>=maxQty?'disabled':''}>+</button>
+        </div>
+      </div>
+      <div class="total-row">
+        <div class="lbl">总计花费</div>
+        <div class="val">${total} ★</div>
+      </div>
+      ${!canAfford ? `<div style="text-align:center;color:#FF6B6B;font-size:16px;margin-bottom:14px">贴纸不够啦～还差 ${total - balance} 张</div>` : ''}
+      <div class="m-actions">
+        <button class="btn ghost" id="cancelBtn">取消</button>
+        <button class="btn primary" id="confirmBtn" ${!canAfford?'disabled':''}>兑换！</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('qtyMinus').onclick = () => { if (pendingQty>1){pendingQty--; renderModal();} };
+  document.getElementById('qtyPlus').onclick  = () => { if (pendingQty<maxQty){pendingQty++; renderModal();} };
+  document.getElementById('cancelBtn').onclick = closeModal;
+  document.getElementById('confirmBtn').onclick = confirmRedeem;
+}
+function confirmRedeem(){
+  const it = items.find(x => x.id === pendingId);
+  if (!it) return;
+  const total = it.stickers * pendingQty;
+  if (balance < total) return;
+  balance -= total;
+  it.quantity -= pendingQty;
+  history.unshift({
+    id: 'local_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8),
+    itemId: it.id,
+    name: it.name,
+    stickers: it.stickers,
+    redeemedQty: pendingQty,
+    imageUrl: it.imageUrl,
+    redeemedAt: Date.now(),
+  });
+  // remove from wishlist if sold out
+  if (it.quantity <= 0) {
+    const wi = wishlist.indexOf(it.id);
+    if (wi >= 0) wishlist.splice(wi, 1);
+  }
+  document.getElementById('stickerBalance').textContent = balance;
+  burstConfetti();
+  showToast(`兑换成功！${it.name}`, '🎉');
+  closeModal();
+  renderStore();
+  renderHistory();
+  renderWishlist();
+  saveState();
+}
 
-  const entry = {
-    id: genId(), type: ledgerType, operator: ledgerOperator,
-    category: ledgerCategory, stickers, note, createdAt: Date.now()
-  };
+/* ============ FX ============ */
+function showToast(text, emoji = '✨'){
+  const layer = document.getElementById('toastLayer');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = `<span>${emoji}</span><span>${escHtml(text)}</span>`;
+  layer.appendChild(t);
+  setTimeout(() => t.remove(), 2400);
+}
+function burstConfetti(){
+  const emojis = ['🎉','⭐','💛','❤️','✨','🎊','🧡'];
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  for (let i = 0; i < 18; i++) {
+    const span = document.createElement('span');
+    span.className = 'burst';
+    span.textContent = emojis[i % emojis.length];
+    span.style.left = cx + 'px';
+    span.style.top = cy + 'px';
+    const angle = (Math.PI * 2 / 18) * i + Math.random()*0.5;
+    const dist = 150 + Math.random() * 150;
+    span.style.setProperty('--dx', (Math.cos(angle)*dist) + 'px');
+    span.style.setProperty('--dy', (Math.sin(angle)*dist) + 'px');
+    span.style.setProperty('--r', (Math.random()*540 - 270) + 'deg');
+    document.body.appendChild(span);
+    setTimeout(() => span.remove(), 1300);
+  }
+}
 
-  const btn = document.getElementById('btn-save-ledger');
-  btn.disabled = true;
+/* ============ TABS ============ */
+document.querySelectorAll('.tab').forEach(t => {
+  t.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+    t.classList.add('active');
+    currentTab = t.dataset.tab;
+    document.getElementById('storeView').style.display   = currentTab === 'store' ? '' : 'none';
+    document.getElementById('historyView').style.display = currentTab === 'history' ? '' : 'none';
+  });
+});
 
-  if (isSupabaseMode()) {
-    ledger.push(entry);
-    saveLocal(); renderLedger();
-    const { error } = await sbClient.from('sticker_ledger').insert(ledgerEntryToRow(entry));
-    if (error) {
-      // Rollback optimistic update
-      ledger = ledger.filter(e => e.id !== entry.id);
-      saveLocal(); renderLedger();
-      btn.disabled = false;
-      showToast('❌ 记录失败，请检查网络后重试');
+/* ============ WISHLIST BUTTONS ============ */
+document.getElementById('wishBtn').addEventListener('click', () => {
+  document.getElementById('wishPanel').classList.add('open');
+});
+document.getElementById('wishClose').addEventListener('click', () => {
+  document.getElementById('wishPanel').classList.remove('open');
+});
+
+/* ============ MODAL BACKDROP CLICK ============ */
+document.getElementById('modalBackdrop').addEventListener('click', (e) => {
+  if (e.target.id === 'modalBackdrop') closeModal();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal();
+    document.getElementById('wishPanel').classList.remove('open');
+  }
+});
+
+/* ============ INITIAL RENDER ============ */
+document.getElementById('walletChip').innerHTML = stickerFor('wallet-doudou');
+
+(async function bootApp(){
+  try {
+    await loadFromSupabase();
+    _booted = true;
+    renderStore();
+    renderHistory();
+    renderWishlist();
+    document.getElementById('stickerBalance').textContent = balance;
+    setSyncStatus('synced', '已同步');
+    subscribeRealtime();
+  } catch (e) {
+    console.error('boot failed', e);
+    setSyncStatus('offline', '离线');
+    showToast('连接数据库失败，请刷新重试', '⚠️');
+  }
+})();
+
+/* ============ SYNC STATUS ============ */
+function setSyncStatus(state /* 'synced' | 'syncing' | 'offline' */, label){
+  const el = document.getElementById('syncLight');
+  if (!el) return;
+  el.classList.remove('synced','syncing','offline');
+  el.classList.add(state);
+  document.getElementById('syncLabel').textContent = label;
+}
+setSyncStatus('syncing', '连接中…');
+document.getElementById('syncLight').addEventListener('click', async () => {
+  setSyncStatus('syncing', '同步中…');
+  try {
+    await loadFromSupabase();
+    renderStore(); renderHistory(); renderWishlist();
+    document.getElementById('stickerBalance').textContent = balance;
+    setSyncStatus('synced', '已同步');
+    showToast('已重新同步', '📡');
+  } catch (e) {
+    console.error(e);
+    setSyncStatus('offline', '离线');
+    showToast('同步失败', '⚠️');
+  }
+});
+
+window.addEventListener('online',  () => setSyncStatus('syncing', '重连中…'));
+window.addEventListener('offline', () => setSyncStatus('offline', '离线'));
+
+/* ============ REALTIME ============ */
+let _refetchT = null;
+function _scheduleRefetch(){
+  if (_pushing) return;
+  clearTimeout(_refetchT);
+  _refetchT = setTimeout(async () => {
+    try {
+      await loadFromSupabase();
+      renderStore(); renderHistory(); renderWishlist();
+      document.getElementById('stickerBalance').textContent = balance;
+      const pp = document.getElementById('parentPanel');
+      if (pp && pp.classList.contains('open')) renderParentPanel();
+    } catch (e) { console.error('refetch failed', e); }
+  }, 250);
+}
+function subscribeRealtime(){
+  sb.channel('store')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'items' },       _scheduleRefetch)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'wallet' },      _scheduleRefetch)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'wishlist' },    _scheduleRefetch)
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'redemptions' }, _scheduleRefetch)
+    .subscribe(status => {
+      if (status === 'SUBSCRIBED') setSyncStatus('synced', '已同步');
+      else if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT') setSyncStatus('offline', '离线');
+    });
+}
+
+/* ============ PARENT MODE ============ */
+let pinBuffer = '';
+function openPinPrompt(){
+  pinBuffer = '';
+  const m = document.getElementById('modal');
+  m.innerHTML = `
+    <div class="pin-modal">
+      <h2>家长模式</h2>
+      <div class="hint">请输入 4 位密码（默认 0000）</div>
+      <div class="pin-dots" id="pinDots">
+        ${[0,1,2,3].map(() => '<div class="pd"></div>').join('')}
+      </div>
+      <div class="pin-pad">
+        ${[1,2,3,4,5,6,7,8,9].map(n => `<button data-pin="${n}">${n}</button>`).join('')}
+        <button class="pin-clear" data-pin="clear">清</button>
+        <button data-pin="0">0</button>
+        <button class="pin-back" data-pin="back">⌫</button>
+      </div>
+    </div>
+  `;
+  document.getElementById('modalBackdrop').classList.add('open');
+  m.querySelectorAll('[data-pin]').forEach(b => {
+    b.addEventListener('click', () => onPinKey(b.dataset.pin));
+  });
+}
+function onPinKey(k){
+  if (k === 'clear') pinBuffer = '';
+  else if (k === 'back') pinBuffer = pinBuffer.slice(0, -1);
+  else if (pinBuffer.length < 4) pinBuffer += k;
+  const dots = document.querySelectorAll('#pinDots .pd');
+  dots.forEach((d,i) => {
+    d.classList.remove('error');
+    d.classList.toggle('filled', i < pinBuffer.length);
+    d.textContent = i < pinBuffer.length ? '•' : '';
+  });
+  if (pinBuffer.length === 4) {
+    setTimeout(() => {
+      if (pinBuffer === pin) {
+        closeModal();
+        openParentPanel();
+      } else {
+        dots.forEach(d => d.classList.add('error'));
+        setTimeout(() => { pinBuffer = ''; onPinKey('clear'); }, 500);
+      }
+    }, 150);
+  }
+}
+document.getElementById('parentGear').addEventListener('click', openPinPrompt);
+
+function openParentPanel(){
+  document.getElementById('parentPanel').classList.add('open');
+  renderParentPanel();
+}
+function closeParentPanel(){
+  document.getElementById('parentPanel').classList.remove('open');
+}
+document.getElementById('ppClose').addEventListener('click', closeParentPanel);
+
+function renderParentPanel(){
+  const body = document.getElementById('ppBody');
+  body.innerHTML = `
+    <!-- Sticker balance -->
+    <div class="pp-section">
+      <h3><span class="ico" style="background:var(--c1)">★</span>豆豆的贴纸余额</h3>
+      <div class="bal-row">
+        <div class="big" id="ppBal">${balance}</div>
+        <button class="minus" data-bal="-1">−1</button>
+        <button class="minus" data-bal="-5">−5</button>
+        <button class="plus" data-bal="+1">+1</button>
+        <button class="plus" data-bal="+5">+5</button>
+        <button class="plus" data-bal="+10">+10</button>
+        <input type="number" id="ppBalInput" placeholder="设为">
+        <button class="set" id="ppBalSet">设定</button>
+      </div>
+    </div>
+
+    <!-- Add new item -->
+    <div class="pp-section">
+      <h3><span class="ico" style="background:var(--c4)">+</span>上架新商品</h3>
+      <div class="add-form">
+        <div class="full">
+          <label>商品名称</label>
+          <input type="text" id="newName" placeholder="例：乐高 71460 海绵宝宝套装">
+        </div>
+        <div>
+          <label>需要多少贴纸？</label>
+          <input type="number" id="newStickers" min="1" placeholder="例：30">
+        </div>
+        <div>
+          <label>库存数量</label>
+          <input type="number" id="newQty" min="1" value="1">
+        </div>
+        <div class="full">
+          <label>商品图片（点击选择，白底会自动抠除）</label>
+          <div class="img-drop" id="imgDrop">
+            <div id="imgDropTxt">🖼 点击上传图片</div>
+            <input type="file" id="newImg" accept="image/*" hidden>
+          </div>
+        </div>
+        <button class="add-btn" id="addBtn">✨ 上架到商店</button>
+      </div>
+    </div>
+
+    <!-- Existing items -->
+    <div class="pp-section">
+      <h3><span class="ico" style="background:var(--c3);color:#FFF">📝</span>现有商品 (${items.length})</h3>
+      <div id="ppItemList"></div>
+    </div>
+
+    <!-- PIN change -->
+    <div class="pp-section">
+      <h3><span class="ico" style="background:var(--c5)">🔐</span>修改家长密码</h3>
+      <div class="pin-change">
+        <input type="password" id="pinOld" placeholder="旧" maxlength="4">
+        <input type="password" id="pinNew" placeholder="新" maxlength="4">
+        <input type="password" id="pinNew2" placeholder="再输" maxlength="4">
+        <button id="pinSave">保存</button>
+        <span style="color:var(--ink-soft);font-size:13px">当前 PIN: <code id="pinView">····</code> <button style="font-size:11px;padding:2px 8px;background:#FFF;border:2px solid var(--line);border-radius:6px;" id="pinReveal">看</button></span>
+      </div>
+    </div>
+  `;
+  // wire balance
+  body.querySelectorAll('[data-bal]').forEach(b => {
+    b.addEventListener('click', () => {
+      balance = Math.max(0, balance + parseInt(b.dataset.bal,10));
+      document.getElementById('ppBal').textContent = balance;
+      document.getElementById('stickerBalance').textContent = balance;
+      saveState();
+    });
+  });
+  document.getElementById('ppBalSet').addEventListener('click', () => {
+    const v = parseInt(document.getElementById('ppBalInput').value, 10);
+    if (!isNaN(v) && v >= 0) {
+      balance = v;
+      document.getElementById('ppBal').textContent = balance;
+      document.getElementById('stickerBalance').textContent = balance;
+      document.getElementById('ppBalInput').value = '';
+      saveState();
+      showToast('贴纸余额已更新', '✨');
+    }
+  });
+
+  // image drop — process white → transparent
+  let pendingImg = null;
+  const drop = document.getElementById('imgDrop');
+  const fileInput = document.getElementById('newImg');
+  drop.addEventListener('click', () => fileInput.click());
+  fileInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const dataUrl = await fileToDataUrl(file);
+    pendingImg = await stripWhiteBackground(dataUrl);
+    drop.classList.add('has');
+    drop.innerHTML = `<img src="${pendingImg}" alt="">`;
+  });
+
+  document.getElementById('addBtn').addEventListener('click', async () => {
+    const name = document.getElementById('newName').value.trim();
+    const stickers = parseInt(document.getElementById('newStickers').value, 10);
+    const qty = parseInt(document.getElementById('newQty').value, 10);
+    if (!name || !stickers || !qty) {
+      showToast('请填写完整', '⚠️');
       return;
     }
-    await loadLedgerFromSupabase();
-  } else {
-    ledger.push(entry);
-    saveLocal(); renderLedger();
-  }
+    if (!pendingImg) {
+      showToast('请上传图片', '⚠️');
+      return;
+    }
+    const addBtnEl = document.getElementById('addBtn');
+    addBtnEl.disabled = true;
+    const id = 's_custom_' + Date.now();
+    try {
+      const publicUrl = await uploadImageToStorage(pendingImg, id);
+      items.push({ id, name, stickers, quantity: qty, imageUrl: publicUrl });
+      await saveState();
+      renderStore();
+      renderParentPanel();
+      showToast(`已上架：${name}`, '🎉');
+    } catch (e) {
+      console.error(e);
+      showToast('上架失败，请稍后再试', '⚠️');
+    } finally {
+      addBtnEl.disabled = false;
+    }
+  });
 
-  btn.disabled = false;
-  closeLedgerModal();
-  showToast(entry.type === 'earn' ? `⭐ 已奖励 +${stickers} 张！` : `已扣除 ${stickers} 张贴纸`);
+  // existing items
+  const list = document.getElementById('ppItemList');
+  list.innerHTML = items.map(it => `
+    <div class="pp-item" data-id="${it.id}">
+      <div class="pi-thumb"><img src="${it.imageUrl}" alt=""></div>
+      <div class="pi-name">${escHtml(it.name)}</div>
+      <div class="pi-stickers">
+        <input type="number" data-edit="stickers" value="${it.stickers}" min="1">
+        <small>贴纸</small>
+      </div>
+      <div class="pi-qty">
+        <input type="number" data-edit="quantity" value="${it.quantity}" min="0">
+        <small>库存</small>
+      </div>
+      <button class="pi-delete" data-del title="删除">🗑</button>
+    </div>
+  `).join('');
+  list.querySelectorAll('.pp-item').forEach(row => {
+    const id = row.dataset.id;
+    row.querySelectorAll('input[data-edit]').forEach(input => {
+      input.addEventListener('change', () => {
+        const it = items.find(x => x.id === id);
+        if (!it) return;
+        const v = parseInt(input.value, 10);
+        if (isNaN(v) || v < 0) { input.value = it[input.dataset.edit]; return; }
+        it[input.dataset.edit] = v;
+        saveState();
+        renderStore();
+      });
+    });
+    row.querySelector('[data-del]').addEventListener('click', () => {
+      if (!confirm('确定删除这件商品？')) return;
+      items = items.filter(x => x.id !== id);
+      // also remove from wishlist
+      const wi = wishlist.indexOf(id);
+      if (wi >= 0) wishlist.splice(wi, 1);
+      saveState();
+      renderStore();
+      renderWishlist();
+      renderParentPanel();
+    });
+  });
+
+  // PIN change
+  document.getElementById('pinReveal').addEventListener('click', () => {
+    const v = document.getElementById('pinView');
+    v.textContent = v.textContent === '····' ? pin : '····';
+  });
+  document.getElementById('pinSave').addEventListener('click', () => {
+    const oldP = document.getElementById('pinOld').value;
+    const n1 = document.getElementById('pinNew').value;
+    const n2 = document.getElementById('pinNew2').value;
+    if (oldP !== pin) { showToast('旧密码不对', '⚠️'); return; }
+    if (!/^\d{4}$/.test(n1)) { showToast('新密码需 4 位数字', '⚠️'); return; }
+    if (n1 !== n2) { showToast('两次输入不一致', '⚠️'); return; }
+    pin = n1;
+    saveState();
+    document.getElementById('pinOld').value = '';
+    document.getElementById('pinNew').value = '';
+    document.getElementById('pinNew2').value = '';
+    showToast('密码已修改', '✅');
+  });
 }
 
-async function deleteLedgerEntry(id) {
-  const entry = ledger.find(e => e.id === id);
-  if (!entry) return;
-  const impact = entry.type === 'earn' ? `余额将减少 ${entry.stickers} 张` : `余额将增加 ${entry.stickers} 张`;
-  if (!confirm(`确定要删除「${entry.category}」记录吗？\n删除后${impact}。`)) return;
-  if (isSupabaseMode()) {
-    const { error } = await sbClient.from('sticker_ledger').delete().eq('id', id);
-    if (error) { showToast('❌ 删除失败，请重试'); return; }
-    await loadLedgerFromSupabase();
-  } else {
-    ledger = ledger.filter(e => e.id !== id);
-    saveLocal(); renderLedger();
-  }
-  showToast('记录已删除');
+/* ============ IMAGE PROCESSING (white → transparent) ============ */
+function fileToDataUrl(file){
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = () => res(r.result);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
 }
-
-/* ============================================================
-   Ledger — Supabase
-============================================================ */
-function ledgerRowToEntry(row) {
-  return {
-    id: row.id, type: row.type, operator: row.operator,
-    category: row.category, stickers: row.stickers,
-    note: row.note || '', createdAt: row.created_at
-  };
+function stripWhiteBackground(dataUrl){
+  return new Promise((res, rej) => {
+    const img = new Image();
+    img.onload = () => {
+      const max = 600;
+      const scale = Math.min(1, max / Math.max(img.width, img.height));
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w; canvas.height = h;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, w, h);
+      const data = ctx.getImageData(0,0,w,h);
+      const px = data.data;
+      const high = 244, low = 220;
+      for (let i = 0; i < px.length; i += 4) {
+        const minRGB = Math.min(px[i], px[i+1], px[i+2]);
+        if (minRGB > high) px[i+3] = 0;
+        else if (minRGB > low) px[i+3] = Math.floor(255 * (1 - (minRGB - low) / (high - low)));
+      }
+      ctx.putImageData(data, 0, 0);
+      res(canvas.toDataURL('image/png'));
+    };
+    img.onerror = rej;
+    img.src = dataUrl;
+  });
 }
-function ledgerEntryToRow(entry) {
-  return {
-    id: entry.id, type: entry.type, operator: entry.operator,
-    category: entry.category, stickers: entry.stickers,
-    note: entry.note || '', created_at: entry.createdAt
-  };
-}
-
-async function loadLedgerFromSupabase() {
-  if (!sbClient) return;
-  const { data, error } = await sbClient.from('sticker_ledger').select('*').order('created_at', { ascending: false });
-  if (error) {
-    console.error('Ledger load failed:', error.message, error);
-    showToast('⚠️ 账本加载失败，请刷新重试');
-    return;
-  }
-  ledger = (data || []).map(ledgerRowToEntry);
-  saveLocal();
-  renderLedger();
-}
-
-/* ============================================================
-   Init
-============================================================ */
-const SEED_ITEMS = [
-  { id: 'seed_21277', name: '乐高 21277 旷野矿井',                       stickers: 55,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/21277-1.jpg', imageData: null, createdAt: 1772323200001 },
-  { id: 'seed_60413', name: '乐高 60413 消防救援飞机',                     stickers: 56,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/60413-1.jpg', imageData: null, createdAt: 1772323200002 },
-  { id: 'seed_60505', name: '乐高 60505 飞机·服务车·气垫船三合一',          stickers: 70,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/60505-1.jpg', imageData: null, createdAt: 1772323200003 },
-  { id: 'seed_60502', name: '乐高 60502 机场与飞机',                       stickers: 100, quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/60502-1.jpg', imageData: null, createdAt: 1772323200004 },
-  { id: 'seed_60457', name: '乐高 60457 改装警车修理厂',                   stickers: 50,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/60457-1.jpg', imageData: null, createdAt: 1772323200005 },
-  { id: 'seed_60434', name: '乐高 60434 太空基地与火箭发射台',               stickers: 130, quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/60434-1.jpg', imageData: null, createdAt: 1772323200006 },
-  { id: 'seed_60431', name: '乐高 60431 太空探索车与外星生命',               stickers: 30,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/60431-1.jpg', imageData: null, createdAt: 1772323200007 },
-  { id: 'seed_60440', name: '乐高 60440 快递货车',                         stickers: 80,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/60440-1.jpg', imageData: null, createdAt: 1772323200008 },
-  { id: 'seed_60500', name: '乐高 60500 乐高面包车',                       stickers: 30,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/60500-1.jpg', imageData: null, createdAt: 1772323200009 },
-  { id: 'seed_60490', name: '乐高 60490 除雪车',                          stickers: 25,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/60490-1.jpg', imageData: null, createdAt: 1772323200010 },
-  { id: 'seed_76320', name: '乐高 76320 钢铁侠与战争机器对抗锤击无人机',      stickers: 30,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/76320-1.jpg', imageData: null, createdAt: 1772323200011 },
-  { id: 'seed_76319', name: '乐高 76319 美国队长大战灭霸',                  stickers: 32,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/76319-1.jpg', imageData: null, createdAt: 1772323200012 },
-  { id: 'seed_40774', name: '乐高 40774 迪士尼经典动画场景',                stickers: 24,  quantity: 1, imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/40774-1.jpg', imageData: null, createdAt: 1772323200013 },
-  { id: 'seed_75410', name: '乐高 75410 曼达洛人与格鲁古的N-1星际战机',      stickers: 26,  quantity: 1,  imageUrl: 'https://wsrv.nl/?url=images.brickset.com/sets/images/75410-1.jpg', imageData: null, createdAt: 1772323200014 },
-  { id: 'seed_ultraman_robux', name: '奥特曼罗布水晶',                           stickers: 6,   quantity: 33, imageUrl: 'https://5b0988e595225.cdn.sohucs.com/q_70,c_zoom,w_640/images/20180903/306c8dd628e94b03a7c93d091042477d.jpeg', imageData: null, createdAt: 1772323200015 }
-];
-
-(function init() {
-  loadLocal();
-  const knownIds = new Set([...items, ...history].map(i => i.id));
-  const toAdd = SEED_ITEMS.filter(i => !knownIds.has(i.id));
-  if (toAdd.length > 0) {
-    items = [...items, ...toAdd];
-    saveLocal();
-  }
-  // Always render immediately with local/seed data so UI is never blank
-  renderCatalog();
-  renderHistory();
-  renderLedger();
-  // Then connect to Supabase (will re-render with cloud data when loaded)
-  tryInitSupabase();
-})();
 </script>
 </body>
 </html>
